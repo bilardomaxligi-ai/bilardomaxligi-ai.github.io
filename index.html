@@ -37,6 +37,11 @@ main{max-width:1100px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-
 .ara{position:relative}
 .ara input{width:100%;font-size:17px;padding:13px 14px;border-radius:10px;border:2px solid var(--line);background:#0e1d2e;color:var(--text);outline:none}
 .ara input:focus{border-color:var(--gold)}
+.ara input{padding-right:50px}
+.ara input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.temizle{position:absolute;right:9px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;border:0;background:#2a4866;color:#eef3f8;font-size:22px;line-height:34px;padding:0;cursor:pointer;display:none}
+.temizle.goster{display:block}
+.temizle:active{background:#3a5f86}
 .oneriler{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;max-height:320px;overflow-y:auto;z-index:4;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 .oneriler div{padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;gap:8px}
 .oneriler div:last-child{border-bottom:0}
@@ -136,6 +141,7 @@ td.p{font-weight:700;color:var(--gold)}
     <div class="kart">
       <div class="ara">
         <input id="ara" type="search" placeholder="Adınızı veya soyadınızı yazın…" autocomplete="off" autocapitalize="words" spellcheck="false">
+        <button class="temizle" id="temizle" type="button" aria-label="Aramayı temizle">×</button>
         <div class="oneriler" id="oneriler" hidden></div>
       </div>
       <div class="ipucu">Birkaç harf yazın, listeden kendinizi seçin. Grubunuz, puanınız ve tüm maçlarınız görünür.</div>
@@ -207,7 +213,7 @@ function oneriGoster() {
 }
 function oyuncuSec(ad) {
   durum.oyuncu = ad; kaydet();
-  $('ara').value = ad; $('oneriler').hidden = true; $('ara').blur();
+  $('ara').value = ad; $('oneriler').hidden = true; $('ara').blur(); temizleGoster();
   oyuncuCiz();
 }
 function oyuncuCiz() {
@@ -336,6 +342,7 @@ function uygula(v) {
   $('gun').textContent = 'Son güncelleme: ' + gunYaz(v.guncelleme);
   if (durum.oyuncu && !OYUNCU[durum.oyuncu]) durum.oyuncu = null;
   if (durum.oyuncu && document.activeElement !== $('ara')) $('ara').value = durum.oyuncu;
+  temizleGoster();
   ciz();
 }
 
@@ -348,7 +355,11 @@ document.addEventListener('click', e => {
   if (td) { oyuncuSec(td.dataset.ad); sekmeAc('oyuncu'); }
   if (!e.target.closest('.ara')) $('oneriler').hidden = true;
 });
-$('ara').addEventListener('input', oneriGoster);
+// × düğmesi: aramayı ve gösterilen oyuncuyu temizler, yeni arama için kutuyu açar
+function temizleGoster() { $('temizle').classList.toggle('goster', !!$('ara').value); }
+$('temizle').addEventListener('mousedown', e => e.preventDefault());
+$('temizle').onclick = () => { $('ara').value = ''; durum.oyuncu = null; kaydet(); oyuncuCiz(); $('oneriler').hidden = true; temizleGoster(); $('ara').focus(); };
+$('ara').addEventListener('input', () => { temizleGoster(); oneriGoster(); });
 $('ara').addEventListener('focus', () => { if ($('ara').value === durum.oyuncu) $('ara').select(); oneriGoster(); });
 $('ara').addEventListener('keydown', e => {
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
