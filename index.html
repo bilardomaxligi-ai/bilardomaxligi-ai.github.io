@@ -153,7 +153,7 @@ td.p{font-weight:700;color:var(--gold)}
       <div id="grupIcerik"></div>
     </div>
   </section>
-  <section id="s-son" hidden><div class="kart"><h2>Son oynanan maçlar</h2><div id="sonIcerik"></div></div></section>
+  <section id="s-son" hidden><div class="kart"><h2>Son 7 günün maçları</h2><div id="sonIcerik"></div></div></section>
   <section id="s-ilk7" hidden><div class="ipucu" style="margin:0 2px 12px">Her grubun ilk 7 oyuncusu bir sonraki tura yükselir.</div><div class="ilk7" id="ilk7Icerik"></div></section>
   <div class="imza">Powered by <b>Ali Kazırlar</b></div>
 </main>
@@ -288,10 +288,13 @@ function macListesi(ms, grupGoster) {
 }
 function sonCiz() {
   if (!V) return;
+  // Son 7 gün: bugün ve önceki 6 gün
+  const d = new Date(); d.setDate(d.getDate() - 6);
+  const sinir = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   const hepsi = [];
-  for (const g of V.gruplar) for (const m of g.maclar) hepsi.push([...m, g.no]);
+  for (const g of V.gruplar) for (const m of g.maclar) if (m[0] && m[0] >= sinir) hepsi.push([...m, g.no]);
   hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
-  $('sonIcerik').innerHTML = hepsi.length ? macListesi(hepsi.slice(0, 60), true) : '<div class="bos">Henüz maç oynanmadı.</div>';
+  $('sonIcerik').innerHTML = hepsi.length ? macListesi(hepsi, true) : '<div class="bos">Son 7 günde oynanan maç yok. Eski maçlar için Gruplar → Maçlar\'a ya da oyuncu aramaya bakın.</div>';
 }
 function ilk7Ciz() {
   if (!V) return;
