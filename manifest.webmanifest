@@ -1,7 +1,7 @@
 {
-  "name": "Bilardomax Ligi",
+  "name": "25. Bilardomax Ligi",
   "short_name": "Bilardomax",
-  "description": "Bilardomax Ligi maç sonuçları ve puan durumu",
+  "description": "25. Bilardomax Ligi maç sonuçları ve puan durumu",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
