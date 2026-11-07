@@ -406,8 +406,8 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
   const samsung = /SamsungBrowser/i.test(navigator.userAgent);
   const m = '<b>Telefona uygulama olarak ekleyin:</b>'
     + (samsung
-      ? '<br><b>Samsung İnternet:</b> Alttaki menüden (<b>⋮</b> veya <b>≡</b>) <b>Sayfayı ekle</b> → <b>Ana ekran</b>\'a dokunun.'
-        + '<br>Tam uygulama görünümü için linki <b>Chrome</b>\'da açıp sağ üstteki <b>⋮</b> → <b>Ana ekrana ekle</b> de yapabilirsiniz.'
+      ? '<br>Samsung İnternet\'te ana ekrana ekleme engellenebiliyor. Aşağıdaki düğmeyle siteyi <b>Chrome</b>\'da açın, sonra sağ üstteki <b>⋮</b> → <b>Ana ekrana ekle</b>\'ye dokunun.'
+        + '<div style="margin-top:8px"><a href="intent://bilardomaxligi-ai.github.io/#Intent;scheme=https;package=com.android.chrome;end" style="display:inline-block;background:var(--gold);color:#1a1300;border-radius:8px;padding:8px 14px;font-weight:700;text-decoration:none">Chrome\'da aç</a></div>'
       : '<br><b>iPhone:</b> Safari\'de alttaki <b>Paylaş</b> (□↑) düğmesine, sonra <b>Ana Ekrana Ekle</b>\'ye dokunun.'
         + '<br><b>Android:</b> Chrome\'da sağ üstteki <b>⋮</b> menüsünden <b>Ana ekrana ekle</b> (veya <b>Uygulamayı yükle</b>) seçeneğine dokunun.')
     + '<div id="kurDugme" style="display:none;margin-top:8px"><button id="kurYukle" style="float:none;background:var(--gold);color:#1a1300;border:0;border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer">Uygulamayı yükle</button></div>';
