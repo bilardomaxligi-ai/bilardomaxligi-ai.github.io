@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>25. Bilardomax Ligi – TV</title>
+<link rel="icon" href="favicon.png">
+<style>
+/* TV ekranı: 15 grubun çapraz tablosu tek ekranda sabit (4×4 kutu, 16. kutu bilgi). Boyutlar ekran yüksekliğine göre ölçeklenir. */
+:root{--bg:#070f1a;--kutu:#0f2032;--cizgi:#29486a;--yazi:#eef3f8;--soluk:#8ea4bb;--altin:#e0b04a;--k:#4be08a;--m:#ff7a70;--b:#6fb3ff}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--yazi);font-family:"Segoe UI",Roboto,Arial,sans-serif;cursor:none}
+.izgara{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:.55vh;height:100vh;box-sizing:border-box;padding:.55vh}
+.kutu{background:var(--kutu);border:1px solid var(--cizgi);border-radius:.7vh;padding:.45vh .6vh .3vh;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.kutu h2{margin:0 0 .25vh;font-size:1.55vh;line-height:1.2;color:var(--altin);display:flex;justify-content:space-between}
+.kutu h2 span{color:var(--soluk);font-weight:400;font-size:1.2vh}
+table{border-collapse:collapse;width:100%;table-layout:fixed;font-variant-numeric:tabular-nums;flex:1}
+th,td{font-size:1.12vh;line-height:1;padding:0;text-align:center;border-bottom:1px solid #1d3550;white-space:nowrap;overflow:hidden}
+th{color:var(--altin);font-weight:700;height:1.5vh}
+td.no{color:var(--altin);font-weight:700}
+td.ad{text-align:left;text-overflow:ellipsis;padding-left:.3vh;font-weight:600}
+th.ad{text-align:left;padding-left:.3vh;color:var(--soluk);font-weight:600}
+td.x{background:repeating-linear-gradient(45deg,#2f4f72 0 .35vh,#26425f .35vh .7vh)}
+td.ek{background:#0b1a2a;font-weight:700} td.p{color:var(--altin)} td.ilk{border-left:2px solid var(--altin)}
+tr:nth-child(even) td:not(.x):not(.ek){background:#132940}
+.k{color:var(--k);font-weight:700} .m{color:var(--m);font-weight:700} .b{color:var(--b);font-weight:700}
+td.ust7{color:var(--altin)}
+/* 16. kutu: bilgi */
+.bilgi{align-items:center;justify-content:center;text-align:center;gap:.6vh;background:radial-gradient(circle at 50% 35%,#16304d 0%,#0b1726 80%)}
+.bilgi .bm{height:7.5vh;border-radius:.8vh}
+.bilgi .ad{font-size:2.3vh;font-weight:700;color:var(--altin)}
+.bilgi .sp{font-size:1.25vh;color:var(--soluk);font-style:italic;display:flex;align-items:center;gap:.6vh}
+.bilgi .sp img{height:2.2vh}
+.bilgi .gun{font-size:1.3vh;color:var(--yazi)}
+.bilgi .acik{font-size:1.1vh;color:var(--soluk);line-height:1.5}
+.bilgi .imza{font-size:1.1vh;color:var(--soluk)} .bilgi .imza b{color:var(--altin);font-weight:600}
+.hata{position:fixed;left:50%;bottom:1vh;transform:translateX(-50%);background:#3a1a1a;color:#ffd0cc;border:1px solid #6b2a2a;border-radius:.6vh;padding:.5vh 1.2vh;font-size:1.3vh;display:none}
+</style>
+</head>
+<body>
+<div class="izgara" id="izgara"></div>
+<div class="hata" id="hata">Bağlantı yok, son veriler gösteriliyor</div>
+<script>
+const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
+const ILK_KAC = 7, YENILE_SN = 60;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sinif = (a, b) => a > b ? 'k' : a < b ? 'm' : 'b';
+function tarihYaz(s) { const m = /^(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d)/.exec(s || ''); return m ? `${m[3]}.${m[2]}.${m[1]} ${m[4]}` : (s || ''); }
+
+function ciz(V) {
+  const kutular = V.gruplar.slice(0, 15).map(g => {
+    const mac = {};
+    for (const [t, a, sa, b, sb] of g.maclar) { mac[a + '|' + b] = [sa, sb]; mac[b + '|' + a] = [sb, sa]; }
+    const ol = g.oyuncular, n = ol.length;
+    const puan = {}; for (const s of g.puan) puan[s[1]] = s;
+    const basl = `<tr><th style="width:1.9vh">#</th><th class="ad" style="width:22%">Oyuncu</th>${ol.map((_, j) => `<th>${j + 1}</th>`).join('')}<th class="ilk" style="width:2.2vh">S</th><th style="width:2.2vh">P</th><th style="width:2.8vh">Av</th></tr>`;
+    const satir = ol.map(([a], i) => {
+      const s = puan[a] || [];
+      const hucre = ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = mac[a + '|' + b]; return m ? `<td class="${sinif(m[0], m[1])}">${esc(m[0])}</td>` : '<td></td>'; }).join('');
+      return `<tr><td class="no">${i + 1}</td><td class="ad">${esc(a)}</td>${hucre}<td class="ek ilk ${s[0] <= ILK_KAC ? 'ust7' : ''}">${esc(s[0])}</td><td class="ek p">${esc(s[7])}</td><td class="ek">${esc(s[10])}</td></tr>`;
+    }).join('');
+    return `<div class="kutu"><h2>${g.no}. Grup<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table>${basl}${satir}</table></div>`;
+  });
+  kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">Hücrede satırdaki oyuncunun sayısı · <span class="k">galibiyet</span> · <span class="m">mağlubiyet</span> · <span class="b">beraberlik</span><br>S: sıra (altın: ilk ${ILK_KAC}) · P: puan · Av: averaj</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
+  document.getElementById('izgara').innerHTML = kutular.join('');
+}
+
+let sonVeri = '';
+async function yukle() {
+  try {
+    const r = await fetch(VERI_ADRESI ? VERI_ADRESI + '?t=' + Date.now() : 'veri.json?' + Date.now(), { cache: 'no-store' });
+    const metin = await r.text(); const V = JSON.parse(metin);
+    if (metin !== sonVeri) { sonVeri = metin; ciz(V); try { localStorage.setItem('bm_tv', metin); } catch (e) {} }
+    document.getElementById('hata').style.display = 'none';
+  } catch (e) {
+    document.getElementById('hata').style.display = 'block';
+    if (!sonVeri) { try { const k = localStorage.getItem('bm_tv'); if (k) { sonVeri = k; ciz(JSON.parse(k)); } } catch (x) {} }
+  }
+}
+yukle(); setInterval(yukle, YENILE_SN * 1000);
+// Güvenlik için her 6 saatte bir sayfayı tamamen yenile (bellek, olası takılma)
+setTimeout(() => location.reload(), 6 * 3600 * 1000);
+// Ekran kararmasın (destekleyen tarayıcılarda)
+let kilit = null;
+async function uyanik() { try { if ('wakeLock' in navigator && document.visibilityState === 'visible') kilit = await navigator.wakeLock.request('screen'); } catch (e) {} }
+uyanik(); document.addEventListener('visibilitychange', uyanik);
+// Ekrana tıklayınca / Enter'a basınca tam ekran
+const tam = () => { const d = document.documentElement; if (!document.fullscreenElement && d.requestFullscreen) d.requestFullscreen().catch(() => {}); };
+document.addEventListener('click', tam); document.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === 'f') tam(); });
+</script>
+</body>
+</html>
