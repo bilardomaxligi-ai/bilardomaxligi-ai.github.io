@@ -96,8 +96,6 @@ td.p{font-weight:700;color:var(--gold)}
 .matris tbody tr td.ad{background:#284a72}
 .matris tbody tr:nth-child(even) td.ad{background:#2d5280}
 .matris .mno{display:inline-block;min-width:22px;margin-right:6px;text-align:right;color:var(--gold);font-weight:700}
-.ilk7{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-.ilk7 .kart{margin:0}
 .bos{color:var(--muted);text-align:center;padding:24px 8px}
 .hata{background:#3a1a1a;border:1px solid #6b2a2a;color:#ffd0cc;border-radius:10px;padding:12px;margin-bottom:12px}
 .tarih-baslik{font-size:13px;color:var(--gold);font-weight:700;margin:12px 0 2px}
@@ -129,7 +127,6 @@ td.p{font-weight:700;color:var(--gold)}
     <button data-s="oyuncu" class="on">Oyuncu ara</button>
     <button data-s="gruplar">Gruplar</button>
     <button data-s="son">Son maçlar</button>
-    <button data-s="ilk7">İlk 7</button>
   </nav>
 </header>
 <main>
@@ -158,8 +155,7 @@ td.p{font-weight:700;color:var(--gold)}
     </div>
   </section>
   <section id="s-son" hidden><div class="kart"><h2>Son 7 günün maçları</h2><div id="sonIcerik"></div></div></section>
-  <section id="s-ilk7" hidden><div class="ipucu" style="margin:0 2px 12px">Her grubun ilk 7 oyuncusu bir sonraki tura yükselir.</div><div class="ilk7" id="ilk7Icerik"></div></section>
-  <div class="imza">Powered by <b>Ali Kazırlar</b></div>
+  <div class="imza">Created by <b>Ali Kazırlar</b></div>
 </main>
 <script>
 // Veri adresi: Apps Script yayın adresi. Boşsa yanındaki veri.json okunur (önizleme).
@@ -300,18 +296,13 @@ function sonCiz() {
   hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
   $('sonIcerik').innerHTML = hepsi.length ? macListesi(hepsi, true) : '<div class="bos">Son 7 günde oynanan maç yok. Eski maçlar için Gruplar → Maçlar\'a ya da oyuncu aramaya bakın.</div>';
 }
-function ilk7Ciz() {
-  if (!V) return;
-  $('ilk7Icerik').innerHTML = V.gruplar.map(g => `<div class="kart"><h2>${g.no}. Grup</h2><table><tbody>${
-    g.puan.slice(0, ILK_KAC).map(s => `<tr><td style="color:var(--gold);font-weight:700;width:28px">${esc(s[0])}</td><td class="ad" data-ad="${esc(s[1])}">${esc(s[1])}</td><td style="color:var(--muted)">${esc(s[2])}</td><td class="p">${esc(s[7])} P</td><td style="color:var(--muted)">${esc(s[10])}</td></tr>`).join('')
-  }</tbody></table></div>`).join('');
-}
 
 // ---- sekmeler ----
 function sekmeAc(s) {
+  if (!['oyuncu', 'gruplar', 'son'].includes(s)) s = 'oyuncu';
   durum.sekme = s; kaydet();
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
-  for (const id of ['oyuncu', 'gruplar', 'son', 'ilk7']) $('s-' + id).hidden = id !== s;
+  for (const id of ['oyuncu', 'gruplar', 'son']) $('s-' + id).hidden = id !== s;
   ciz();
   window.scrollTo(0, 0);
 }
@@ -319,8 +310,7 @@ function ciz() {
   if (!V) return;
   if (durum.sekme === 'oyuncu') oyuncuCiz();
   else if (durum.sekme === 'gruplar') grupCiz();
-  else if (durum.sekme === 'son') sonCiz();
-  else ilk7Ciz();
+  else sonCiz();
 }
 
 // ---- veri yükleme ----
@@ -395,13 +385,13 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 })();
 if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(k => k.update()).catch(() => {});
 
-// Doğrudan bağlantı: #o=Ad Soyad (oyuncu), #g6 / #g6-matris / #g6-maclar (grup), #son, #ilk7
+// Doğrudan bağlantı: #o=Ad Soyad (oyuncu), #g6 / #g6-matris / #g6-maclar (grup), #son
 (function () {
   const h = decodeURIComponent(location.hash.slice(1));
   let m;
   if (h.startsWith('o=')) { durum.oyuncu = h.slice(2); durum.sekme = 'oyuncu'; }
   else if ((m = h.match(/^g(\d+)(?:-(puan|matris|maclar))?$/))) { durum.grup = +m[1]; durum.grupSekme = m[2] || 'puan'; durum.sekme = 'gruplar'; }
-  else if (h === 'son' || h === 'ilk7') durum.sekme = h;
+  else if (h === 'son') durum.sekme = h;
 })();
 sekmeAc(durum.sekme);
 yukle(false);
