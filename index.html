@@ -145,7 +145,7 @@ td.p{font-weight:700;color:var(--gold)}
 .acilis .a-bm{width:150px;height:auto;border-radius:12px}
 .acilis .a-ad{font-size:22px;font-weight:700;color:var(--gold);margin-top:4px}
 .acilis .a-sp{font-size:13px;color:var(--muted);font-style:italic;margin-top:18px}
-.acilis .a-mt{width:200px;height:auto;animation:spGel .8s ease-out both}
+.acilis .a-mt{width:160px;height:auto;animation:spGel .8s ease-out both}
 @keyframes spGel{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .kur button{float:right;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 @media (max-width:600px){
@@ -468,13 +468,13 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.se
   else if ((m = h.match(/^g(\d+)(?:-(puan|matris|maclar))?$/))) { durum.grup = +m[1]; durum.grupSekme = m[2] || 'puan'; durum.sekme = 'gruplar'; }
   else if (h === 'son') durum.sekme = h;
 })();
-// Açılış ekranı (sponsor): her ziyarette bir kez ~1,8 sn görünür, dokununca hemen kapanır
+// Açılış ekranı (sponsor): her ziyarette bir kez ~2,6 sn görünür, dokununca hemen kapanır
 (function () {
   const a = $('acilis'); let goster = true;
   try { goster = sessionStorage.getItem('bm_acilis') !== '1'; sessionStorage.setItem('bm_acilis', '1'); } catch (e) {}
   const kapat = () => { a.classList.add('git'); setTimeout(() => a.remove(), 600); };
   if (!goster) { a.remove(); return; }
-  a.onclick = kapat; setTimeout(kapat, 1800);
+  a.onclick = kapat; setTimeout(kapat, 2600);
 })();
 // Üst başlığın yüksekliği: çapraz tablo kutusu ekrana sığsın (yatay/dikey çevirince yeniden ölçülür)
 function hhOlc() { document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px'); }
