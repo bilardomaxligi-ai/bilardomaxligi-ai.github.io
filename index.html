@@ -78,11 +78,20 @@ td.ad{font-weight:600;cursor:pointer}
 tr.ust7 td:first-child{color:var(--gold);font-weight:700}
 tr.ayrac td{border-bottom:2px dashed var(--gold)}
 td.p{font-weight:700;color:var(--gold)}
-.matris th.dik{writing-mode:vertical-rl;transform:rotate(180deg);height:120px;vertical-align:bottom;padding:6px 4px}
-.matris td{font-size:13px;padding:6px 4px;min-width:46px}
-.matris td.x{background:#08121e}
-.matris td.k{color:var(--win);font-weight:700} .matris td.m{color:var(--lose);font-weight:700} .matris td.b{color:var(--draw);font-weight:700}
-.matris td.ad,.matris th.ad{position:sticky;left:0;background:var(--panel);z-index:1}
+/* Çapraz tablo: kaydırma kutusu kenara kadar (boşlukta kayan isim görünmesin), daha açık zemin */
+.kaydir.mk{margin:0;padding:0;border:1px solid #3a5f86;border-radius:8px;background:#203c5c}
+.matris{background:#203c5c}
+.matris th,.matris td{border-bottom:1px solid #3a5f86;border-right:1px solid #31547a}
+.matris thead th{background:#18324f;color:#c9d8e8}
+.matris tbody tr:nth-child(even) td{background:#25446a}
+.matris th.dik{writing-mode:vertical-rl;transform:rotate(180deg);height:120px;vertical-align:bottom;padding:6px 4px;font-weight:600}
+.matris td{font-size:13px;padding:7px 4px;min-width:46px;color:#eef3f8}
+.matris tbody tr td.x{background:repeating-linear-gradient(45deg,#40648c 0 4px,#355779 4px 8px)}
+.matris td.k{color:#4be08a;font-weight:700} .matris td.m{color:#ff7a70;font-weight:700} .matris td.b{color:#6fb3ff;font-weight:700}
+.matris td.ad,.matris th.ad{position:sticky;left:0;z-index:2;box-shadow:2px 0 6px rgba(0,0,0,.45)}
+.matris thead th.ad{background:#18324f;z-index:3}
+.matris tbody tr td.ad{background:#284a72}
+.matris tbody tr:nth-child(even) td.ad{background:#2d5280}
 .ilk7{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .ilk7 .kart{margin:0}
 .bos{color:var(--muted);text-align:center;padding:24px 8px}
@@ -98,6 +107,8 @@ td.p{font-weight:700;color:var(--gold)}
   .gizle-k{display:none}
   .sekme2 button{font-size:13px;padding:8px 4px;white-space:nowrap}
   .cipler{gap:5px} .cipler button{min-width:38px;padding:7px 8px;font-size:14px}
+  .matris td.ad,.matris th.ad{font-size:13px;padding-left:8px}
+  .matris td{min-width:44px}
 }
 </style>
 </head>
@@ -248,7 +259,7 @@ function grupCiz() {
     }</tbody></table></div><div class="ipucu">Galibiyet 2 puan · Beraberlik 1 · Mağlubiyet 0. Kesikli çizginin üstündeki ilk ${ILK_KAC} oyuncu üst tura çıkar. İsme dokunun, o oyuncunun maçları açılır.</div>`;
   } else if (durum.grupSekme === 'matris') {
     const ol = g.oyuncular;
-    el.innerHTML = `<div class="kaydir"><table class="matris"><thead><tr><th class="ad">Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}</tr></thead><tbody>${
+    el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad">Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}</tr></thead><tbody>${
       ol.map(([a, h]) => `<tr><td class="ad" data-ad="${esc(a)}">${esc(a)} <small style="color:var(--muted);font-weight:400">(${esc(h)})</small></td>${
         ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; return m ? `<td class="${sonucSinif(m[0], m[1])}">${esc(m[0])}-${esc(m[1])}</td>` : '<td></td>'; }).join('')
       }</tr>`).join('')
