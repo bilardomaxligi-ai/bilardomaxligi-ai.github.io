@@ -376,7 +376,7 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
   $('kurMetin').innerHTML = m; $('kur').style.display = 'block';
   $('kurKapat').onclick = () => { $('kur').style.display = 'none'; try { localStorage.setItem('bm_kur', '1'); } catch (e) {} };
 })();
-if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(k => k.update()).catch(() => {});
 
 // Doğrudan bağlantı: #o=Ad Soyad (oyuncu), #g6 / #g6-matris / #g6-maclar (grup), #son, #ilk7
 (function () {
