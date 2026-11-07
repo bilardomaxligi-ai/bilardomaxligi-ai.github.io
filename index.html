@@ -370,11 +370,9 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
   const tek = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
   let kapali = false; try { kapali = localStorage.getItem('bm_kur') === '1'; } catch (e) {}
   if (tek || kapali) return;
-  const ua = navigator.userAgent;
-  let m = '';
-  if (/iPhone|iPad|iPod/.test(ua)) m = '<b>Telefona uygulama olarak ekleyin:</b> Safari\'de alttaki <b>Paylaş</b> (□↑) düğmesine, sonra <b>Ana Ekrana Ekle</b>\'ye dokunun.';
-  else if (/Android/.test(ua)) m = '<b>Telefona uygulama olarak ekleyin:</b> Chrome\'da sağ üstteki <b>⋮</b> menüsünden <b>Ana ekrana ekle</b>\'ye dokunun.';
-  if (!m) return;
+  const m = '<b>Telefona uygulama olarak ekleyin:</b>'
+    + '<br><b>iPhone:</b> Safari\'de alttaki <b>Paylaş</b> (□↑) düğmesine, sonra <b>Ana Ekrana Ekle</b>\'ye dokunun.'
+    + '<br><b>Android:</b> Chrome\'da sağ üstteki <b>⋮</b> menüsünden <b>Ana ekrana ekle</b> (veya <b>Uygulamayı yükle</b>) seçeneğine dokunun.';
   $('kurMetin').innerHTML = m; $('kur').style.display = 'block';
   $('kurKapat').onclick = () => { $('kur').style.display = 'none'; try { localStorage.setItem('bm_kur', '1'); } catch (e) {} };
 })();
