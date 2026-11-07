@@ -55,6 +55,7 @@ main{max-width:1100px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-
 .mac{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 2px;border-bottom:1px solid var(--line);align-items:center}
 .mac:last-child{border-bottom:0}
 .mac .rk{font-weight:600}
+.mac .rk[data-ad]{cursor:pointer;text-decoration:underline dotted rgba(147,168,191,.6);text-underline-offset:3px}
 .mac .rk small{color:var(--muted);font-weight:400}
 .mac .tr{font-size:12px;color:var(--muted)}
 .mac .sk{grid-row:1 / span 2;grid-column:2;text-align:right}
@@ -227,7 +228,7 @@ function oyuncuCiz() {
   oynanan.sort((a, b) => (b.m[2] || '').localeCompare(a.m[2] || ''));
   const satir = r => {
     const c = r.m ? sonucSinif(r.m[0], r.m[1]) : 'o';
-    return `<div class="mac"><div class="rk">${esc(r.ad)} <small>(${esc(r.hnd)})</small></div>
+    return `<div class="mac"><div class="rk" data-ad="${esc(r.ad)}">${esc(r.ad)} <small>(${esc(r.hnd)})</small></div>
       <div class="sk">${r.m ? `<div class="skor">${esc(r.m[0])} - ${esc(r.m[1])}</div>` : ''}<span class="sonuc s-${c}">${SONUC_AD[c]}</span></div>
       <div class="tr">${r.m ? tarihYaz(r.m[2]) : 'Maç kaldı'}</div></div>`;
   };
@@ -281,9 +282,9 @@ function macListesi(ms, grupGoster) {
     if (t !== son) { h += `<div class="tarih-baslik">${t ? tarihYaz(t) : 'Tarihsiz'}</div>`; son = t; }
     const ca = sonucSinif(sa, sb), cb = sonucSinif(sb, sa);
     h += `<div class="mac" style="grid-template-columns:1fr auto 1fr">
-      <div class="rk" style="text-align:right;color:var(--${ca === 'k' ? 'win' : ca === 'm' ? 'text' : 'draw'})">${esc(a)}</div>
+      <div class="rk" data-ad="${esc(a)}" style="text-align:right;color:var(--${ca === 'k' ? 'win' : ca === 'm' ? 'text' : 'draw'})">${esc(a)}</div>
       <div class="skor" style="padding:0 6px">${esc(sa)} - ${esc(sb)}</div>
-      <div class="rk" style="color:var(--${cb === 'k' ? 'win' : cb === 'm' ? 'text' : 'draw'})">${esc(b)}</div>
+      <div class="rk" data-ad="${esc(b)}" style="color:var(--${cb === 'k' ? 'win' : cb === 'm' ? 'text' : 'draw'})">${esc(b)}</div>
       ${grupGoster ? `<div class="tr" style="grid-column:1 / span 3;text-align:center">${gno}. Grup</div>` : ''}</div>`;
   }
   return h;
@@ -352,7 +353,7 @@ $('nav').onclick = e => { const b = e.target.closest('button'); if (b) sekmeAc(b
 $('grupCip').onclick = e => { const b = e.target.closest('button'); if (b) { durum.grup = +b.dataset.g; kaydet(); grupCiz(); } };
 $('grupSekme').onclick = e => { const b = e.target.closest('button'); if (b) { durum.grupSekme = b.dataset.g; kaydet(); grupCiz(); } };
 document.addEventListener('click', e => {
-  const td = e.target.closest('td.ad[data-ad]');
+  const td = e.target.closest('[data-ad]');
   if (td) { oyuncuSec(td.dataset.ad); sekmeAc('oyuncu'); }
   if (!e.target.closest('.ara')) $('oneriler').hidden = true;
 });
