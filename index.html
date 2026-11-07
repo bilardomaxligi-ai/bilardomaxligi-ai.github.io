@@ -87,7 +87,9 @@ td.p{font-weight:700;color:var(--gold)}
 .matris th.dik{writing-mode:vertical-rl;transform:rotate(180deg);height:120px;vertical-align:bottom;padding:6px 4px;font-weight:600}
 .matris td{font-size:13px;padding:7px 4px;min-width:46px;color:#eef3f8}
 .matris tbody tr td.x{background:repeating-linear-gradient(45deg,#40648c 0 4px,#355779 4px 8px)}
-.matris td.k{color:#4be08a;font-weight:700} .matris td.m{color:#ff7a70;font-weight:700} .matris td.b{color:#6fb3ff;font-weight:700}
+/* Çapraz tablo skorları: galibin sayısı yeşil, mağlubun kırmızı, beraberlik sarı */
+.matris td .sk-k{color:#4be08a;font-weight:700} .matris td .sk-m{color:#ff7a70;font-weight:700} .matris td .sk-b{color:#ffd54a;font-weight:700}
+.matris td .sk-a{color:#9fb4c8}
 .matris td.ad,.matris th.ad{position:sticky;left:0;z-index:2;box-shadow:2px 0 6px rgba(0,0,0,.45)}
 .matris thead th.ad{background:#18324f;z-index:3}
 .matris tbody tr td.ad{background:#284a72}
@@ -264,9 +266,9 @@ function grupCiz() {
     const ol = g.oyuncular;
     el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad">Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}</tr></thead><tbody>${
       ol.map(([a, h]) => `<tr><td class="ad" data-ad="${esc(a)}">${esc(a)} <small style="color:var(--muted);font-weight:400">(${esc(h)})</small></td>${
-        ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; return m ? `<td class="${sonucSinif(m[0], m[1])}">${esc(m[0])}-${esc(m[1])}</td>` : '<td></td>'; }).join('')
+        ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; if (!m) return '<td></td>'; const c1 = sonucSinif(m[0], m[1]), c2 = sonucSinif(m[1], m[0]); return `<td><span class="sk-${c1}">${esc(m[0])}</span><span class="sk-a">-</span><span class="sk-${c2}">${esc(m[1])}</span></td>`; }).join('')
       }</tr>`).join('')
-    }</tbody></table></div><div class="ipucu">Satırdaki oyuncunun skoru solda. Yeşil kazandı, kırmızı kaybetti, mavi berabere.</div>`;
+    }</tbody></table></div><div class="ipucu">Satırdaki oyuncunun skoru solda. Galibin sayısı yeşil, mağlubun kırmızı, beraberlik sarı.</div>`;
   } else {
     const ms = g.maclar.slice().sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
     el.innerHTML = ms.length ? macListesi(ms) : '<div class="bos">Bu grupta henüz maç oynanmadı.</div>';
