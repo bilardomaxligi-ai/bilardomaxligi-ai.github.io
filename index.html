@@ -101,11 +101,17 @@ tr.ayrac td{border-bottom:2px dashed var(--gold)}
 td.p{font-weight:700;color:var(--gold)}
 /* Çapraz tablo: kaydırma kutusu kenara kadar (boşlukta kayan isim görünmesin), daha açık zemin */
 .kaydir.mk{margin:0;padding:0;border:1px solid #3a5f86;border-radius:8px;background:#203c5c}
+/* Çapraz tablo kendi içinde iki yönde kayar: üstteki isimler ve soldaki isimler sabit kalır */
+.kaydir.mk{overflow:auto;max-height:calc(100dvh - var(--hh,120px) - 10px);overscroll-behavior:contain}
+.matris{border-collapse:separate;border-spacing:0}
+.matris thead th{position:sticky;top:0;z-index:2}
+.matris thead th.ad{left:0;z-index:4}
+.matris th.dik span{display:inline-block;writing-mode:vertical-rl;transform:rotate(180deg)}
 .matris{background:#203c5c}
 .matris th,.matris td{border-bottom:1px solid #3a5f86;border-right:1px solid #31547a}
 .matris thead th{background:#18324f;color:#c9d8e8}
 .matris tbody tr:nth-child(even) td{background:#25446a}
-.matris th.dik{writing-mode:vertical-rl;transform:rotate(180deg);height:120px;vertical-align:bottom;padding:6px 4px;font-weight:600}
+.matris th.dik{height:120px;vertical-align:bottom;padding:6px 4px;font-weight:600}
 .matris thead th.ek{vertical-align:bottom;color:var(--gold);background:#132a44;min-width:44px}
 .matris tbody tr td.ek{background:#16304d;font-weight:700;min-width:44px}
 .matris tbody tr td.ek.ilk{border-left:2px solid var(--gold)}
@@ -289,7 +295,7 @@ function grupCiz() {
     }</tbody></table></div><div class="ipucu">Galibiyet 2 puan · Beraberlik 1 · Mağlubiyet 0. Kesikli çizginin üstündeki ilk ${ILK_KAC} oyuncu üst tura çıkar. İsme dokunun, o oyuncunun maçları açılır.</div>`;
   } else if (durum.grupSekme === 'matris') {
     const ol = g.oyuncular;
-    el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad"><span class="mno">#</span>Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}<th class="ek ilk">Sıra</th><th class="ek">Puan</th><th class="ek">Averaj</th></tr></thead><tbody>${
+    el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad"><span class="mno">#</span>Oyuncu</th>${ol.map(([ad]) => `<th class="dik"><span>${esc(ad)}</span></th>`).join('')}<th class="ek ilk">Sıra</th><th class="ek">Puan</th><th class="ek">Averaj</th></tr></thead><tbody>${
       ol.map(([a, h], i) => `<tr><td class="ad" data-ad="${esc(a)}"><span class="mno">${i + 1}</span>${esc(a)} <small style="color:var(--muted);font-weight:400">(${esc(h)})</small></td>${
         ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; if (!m) return '<td></td>'; const c1 = sonucSinif(m[0], m[1]), c2 = sonucSinif(m[1], m[0]); return `<td><span class="sk-${c1}">${esc(m[0])}</span><span class="sk-a">-</span><span class="sk-${c2}">${esc(m[1])}</span></td>`; }).join('')
       }${(s => `<td class="ek ilk">${esc(s[0] ?? '')}</td><td class="ek p">${esc(s[7] ?? '')}</td><td class="ek">${esc(s[10] ?? '')}</td>`)(g.puan.find(x => x[1] === a) || [])}</tr>`).join('')
@@ -429,6 +435,9 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.se
   else if ((m = h.match(/^g(\d+)(?:-(puan|matris|maclar))?$/))) { durum.grup = +m[1]; durum.grupSekme = m[2] || 'puan'; durum.sekme = 'gruplar'; }
   else if (h === 'son') durum.sekme = h;
 })();
+// Üst başlığın yüksekliği: çapraz tablo kutusu ekrana sığsın (yatay/dikey çevirince yeniden ölçülür)
+function hhOlc() { document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px'); }
+hhOlc(); window.addEventListener('resize', hhOlc); window.addEventListener('orientationchange', () => setTimeout(hhOlc, 300));
 sekmeAc(durum.sekme);
 yukle(false);
 </script>
