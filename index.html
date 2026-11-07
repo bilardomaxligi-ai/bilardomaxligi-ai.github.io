@@ -82,9 +82,11 @@ main{max-width:1100px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-
 .cipler{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .cipler button{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:8px;min-width:42px;padding:8px 10px;font-size:15px;font-weight:600;cursor:pointer}
 .cipler button.on{background:var(--gold);color:#1a1300;border-color:var(--gold)}
-.sekme2{display:flex;gap:6px;margin:0 0 10px}
-.sekme2 button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px;font-size:14px;font-weight:600;cursor:pointer}
-.sekme2 button.on{background:var(--panel2);color:var(--text);border-color:var(--gold)}
+.sekme2{display:flex;gap:8px;margin:0 0 12px}
+.sekme2 button{flex:1;background:#21446a;border:1px solid #3f6992;color:#e6eef6;border-radius:10px;padding:11px 8px;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 0 #0a1524;transition:background .15s,transform .05s}
+.sekme2 button:hover{background:#2b5682}
+.sekme2 button:active{transform:translateY(2px);box-shadow:0 1px 0 #0a1524}
+.sekme2 button.on{background:var(--gold);color:#1a1300;border-color:#f0c766;box-shadow:0 3px 0 #8a6a1c}
 .kaydir{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -14px;padding:0 14px}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
@@ -101,6 +103,11 @@ td.p{font-weight:700;color:var(--gold)}
 .matris thead th{background:#18324f;color:#c9d8e8}
 .matris tbody tr:nth-child(even) td{background:#25446a}
 .matris th.dik{writing-mode:vertical-rl;transform:rotate(180deg);height:120px;vertical-align:bottom;padding:6px 4px;font-weight:600}
+.matris thead th.ek{vertical-align:bottom;color:var(--gold);background:#132a44;min-width:44px}
+.matris tbody tr td.ek{background:#16304d;font-weight:700;min-width:44px}
+.matris tbody tr td.ek.ilk{border-left:2px solid var(--gold)}
+.matris thead th.ek.ilk{border-left:2px solid var(--gold)}
+.matris tbody tr td.ek.p{color:var(--gold)}
 .matris td{font-size:13px;padding:7px 4px;min-width:46px;color:#eef3f8}
 .matris tbody tr td.x{background:repeating-linear-gradient(45deg,#40648c 0 4px,#355779 4px 8px)}
 /* Çapraz tablo skorları: galibin sayısı yeşil, mağlubun kırmızı, beraberlik mavi */
@@ -124,7 +131,7 @@ td.p{font-weight:700;color:var(--gold)}
   nav button{font-size:14px;padding:9px 8px}
   th,td{padding:7px 4px}
   .gizle-k{display:none}
-  .sekme2 button{font-size:13px;padding:8px 4px;white-space:nowrap}
+  .sekme2 button{font-size:13px;padding:10px 4px;white-space:nowrap}
   .cipler{gap:5px} .cipler button{min-width:38px;padding:7px 8px;font-size:14px}
   .matris td.ad,.matris th.ad{font-size:13px;padding-left:8px}
   .matris td{min-width:44px}
@@ -278,10 +285,10 @@ function grupCiz() {
     }</tbody></table></div><div class="ipucu">Galibiyet 2 puan · Beraberlik 1 · Mağlubiyet 0. Kesikli çizginin üstündeki ilk ${ILK_KAC} oyuncu üst tura çıkar. İsme dokunun, o oyuncunun maçları açılır.</div>`;
   } else if (durum.grupSekme === 'matris') {
     const ol = g.oyuncular;
-    el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad"><span class="mno">#</span>Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}</tr></thead><tbody>${
+    el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad"><span class="mno">#</span>Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}<th class="ek ilk">Sıra</th><th class="ek">Puan</th><th class="ek">Averaj</th></tr></thead><tbody>${
       ol.map(([a, h], i) => `<tr><td class="ad" data-ad="${esc(a)}"><span class="mno">${i + 1}</span>${esc(a)} <small style="color:var(--muted);font-weight:400">(${esc(h)})</small></td>${
         ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; if (!m) return '<td></td>'; const c1 = sonucSinif(m[0], m[1]), c2 = sonucSinif(m[1], m[0]); return `<td><span class="sk-${c1}">${esc(m[0])}</span><span class="sk-a">-</span><span class="sk-${c2}">${esc(m[1])}</span></td>`; }).join('')
-      }</tr>`).join('')
+      }${(s => `<td class="ek ilk">${esc(s[0] ?? '')}</td><td class="ek p">${esc(s[7] ?? '')}</td><td class="ek">${esc(s[10] ?? '')}</td>`)(g.puan.find(x => x[1] === a) || [])}</tr>`).join('')
     }</tbody></table></div><div class="ipucu">Satırdaki oyuncunun skoru solda. Galibin sayısı yeşil, mağlubun kırmızı, beraberlik mavi.</div>`;
   } else {
     const ms = g.maclar.slice().sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
