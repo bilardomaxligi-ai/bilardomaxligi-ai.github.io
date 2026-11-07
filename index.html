@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bilardomax Ligi</title>
+<meta name="description" content="Bilardomax Ligi maç sonuçları, puan durumu ve oyuncu arama">
+<meta name="theme-color" content="#0b1726">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bilardomax">
+<style>
+:root{
+  --bg:#0b1726; --panel:#122337; --panel2:#18304a; --line:#25425f; --text:#eef3f8; --muted:#93a8bf;
+  --gold:#e0b04a; --teal:#1aa39a; --win:#2fb36a; --lose:#e2524a; --draw:#3d8fe0; --none:#6b7f95;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+a{color:inherit}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#000 0%,#0b1726 100%);border-bottom:1px solid var(--line);padding:calc(env(safe-area-inset-top) + 6px) 16px 0}
+.ust{display:flex;align-items:center;gap:12px;max-width:1100px;margin:0 auto}
+.ust img{height:52px;width:auto}
+.ust h1{font-size:18px;margin:0;letter-spacing:.3px}
+.ust .gun{font-size:12px;color:var(--muted)}
+.ust .yenile{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer}
+nav{display:flex;gap:4px;max-width:1100px;margin:8px auto 0;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{flex:1 0 auto;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font-size:15px;font-weight:600;padding:10px 12px;cursor:pointer}
+nav button.on{color:var(--gold);border-bottom-color:var(--gold)}
+main{max-width:1100px;margin:0 auto;padding:16px 16px calc(32px + env(safe-area-inset-bottom))}
+.kart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.kart h2{font-size:16px;margin:0 0 10px;color:var(--gold)}
+.ara{position:relative}
+.ara input{width:100%;font-size:17px;padding:13px 14px;border-radius:10px;border:2px solid var(--line);background:#0e1d2e;color:var(--text);outline:none}
+.ara input:focus{border-color:var(--gold)}
+.oneriler{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;max-height:320px;overflow-y:auto;z-index:4;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.oneriler div{padding:11px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.oneriler div:last-child{border-bottom:0}
+.oneriler div:hover,.oneriler div.sec{background:#20405f}
+.oneriler small{color:var(--muted);white-space:nowrap}
+.ipucu{color:var(--muted);font-size:13px;margin:8px 2px 0}
+.oyuncu-bas{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:10px}
+.oyuncu-bas .ad{font-size:21px;font-weight:700}
+.rozet{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px;color:var(--muted)}
+.rozet b{color:var(--text)}
+.sayilar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0 12px}
+.sayilar div{background:var(--panel2);border-radius:10px;padding:8px 6px;text-align:center}
+.sayilar b{display:block;font-size:20px}
+.sayilar span{font-size:12px;color:var(--muted)}
+.sayilar .k b{color:var(--win)} .sayilar .m b{color:var(--lose)} .sayilar .be b{color:var(--draw)} .sayilar .p b{color:var(--gold)}
+.mac{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 2px;border-bottom:1px solid var(--line);align-items:center}
+.mac:last-child{border-bottom:0}
+.mac .rk{font-weight:600}
+.mac .rk small{color:var(--muted);font-weight:400}
+.mac .tr{font-size:12px;color:var(--muted)}
+.mac .sk{grid-row:1 / span 2;grid-column:2;text-align:right}
+.sonuc{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;margin-top:2px}
+.s-k{background:rgba(47,179,106,.18);color:var(--win)} .s-m{background:rgba(226,82,74,.18);color:var(--lose)}
+.s-b{background:rgba(61,143,224,.18);color:var(--draw)} .s-o{background:rgba(107,127,149,.18);color:var(--muted)}
+.skor{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.alt-baslik{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 4px}
+.cipler{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.cipler button{background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:8px;min-width:42px;padding:8px 10px;font-size:15px;font-weight:600;cursor:pointer}
+.cipler button.on{background:var(--gold);color:#1a1300;border-color:var(--gold)}
+.sekme2{display:flex;gap:6px;margin:0 0 10px}
+.sekme2 button{flex:1;background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px;font-size:14px;font-weight:600;cursor:pointer}
+.sekme2 button.on{background:var(--panel2);color:var(--text);border-color:var(--gold)}
+.kaydir{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -14px;padding:0 14px}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.ad,th.ad{text-align:left;white-space:nowrap}
+td.ad{font-weight:600;cursor:pointer}
+tr.ust7 td:first-child{color:var(--gold);font-weight:700}
+tr.ayrac td{border-bottom:2px dashed var(--gold)}
+td.p{font-weight:700;color:var(--gold)}
+.matris th.dik{writing-mode:vertical-rl;transform:rotate(180deg);height:120px;vertical-align:bottom;padding:6px 4px}
+.matris td{font-size:13px;padding:6px 4px;min-width:46px}
+.matris td.x{background:#08121e}
+.matris td.k{color:var(--win);font-weight:700} .matris td.m{color:var(--lose);font-weight:700} .matris td.b{color:var(--draw);font-weight:700}
+.matris td.ad,.matris th.ad{position:sticky;left:0;background:var(--panel);z-index:1}
+.ilk7{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ilk7 .kart{margin:0}
+.bos{color:var(--muted);text-align:center;padding:24px 8px}
+.hata{background:#3a1a1a;border:1px solid #6b2a2a;color:#ffd0cc;border-radius:10px;padding:12px;margin-bottom:12px}
+.tarih-baslik{font-size:13px;color:var(--gold);font-weight:700;margin:12px 0 2px}
+.kur{display:none;background:var(--panel2);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:14px}
+.kur b{color:var(--gold)}
+.kur button{float:right;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
+@media (max-width:600px){
+  .ust img{height:44px} .ust h1{font-size:16px}
+  nav button{font-size:14px;padding:9px 8px}
+  th,td{padding:7px 4px}
+  .gizle-k{display:none}
+  .sekme2 button{font-size:13px;padding:8px 4px;white-space:nowrap}
+  .cipler{gap:5px} .cipler button{min-width:38px;padding:7px 8px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="ust">
+    <img src="logo.png" alt="Bilardomax">
+    <div><h1>Bilardomax Ligi</h1><div class="gun" id="gun">Yükleniyor…</div></div>
+    <button class="yenile" id="yenile" title="Yenile">↻ Yenile</button>
+  </div>
+  <nav id="nav">
+    <button data-s="oyuncu" class="on">Oyuncu ara</button>
+    <button data-s="gruplar">Gruplar</button>
+    <button data-s="son">Son maçlar</button>
+    <button data-s="ilk7">İlk 7</button>
+  </nav>
+</header>
+<main>
+  <div class="kur" id="kur"><button id="kurKapat" aria-label="Kapat">×</button><span id="kurMetin"></span></div>
+  <div id="hata"></div>
+  <section id="s-oyuncu">
+    <div class="kart">
+      <div class="ara">
+        <input id="ara" type="search" placeholder="Adınızı veya soyadınızı yazın…" autocomplete="off" autocapitalize="words" spellcheck="false">
+        <div class="oneriler" id="oneriler" hidden></div>
+      </div>
+      <div class="ipucu">Birkaç harf yazın, listeden kendinizi seçin. Grubunuz, puanınız ve tüm maçlarınız görünür.</div>
+    </div>
+    <div id="oyuncuSonuc"></div>
+  </section>
+  <section id="s-gruplar" hidden>
+    <div class="cipler" id="grupCip"></div>
+    <div class="kart">
+      <h2 id="grupBaslik"></h2>
+      <div class="sekme2" id="grupSekme">
+        <button data-g="puan" class="on">Puan durumu</button>
+        <button data-g="matris">Çapraz tablo</button>
+        <button data-g="maclar">Maçlar</button>
+      </div>
+      <div id="grupIcerik"></div>
+    </div>
+  </section>
+  <section id="s-son" hidden><div class="kart"><h2>Son oynanan maçlar</h2><div id="sonIcerik"></div></div></section>
+  <section id="s-ilk7" hidden><div class="ipucu" style="margin:0 2px 12px">Her grubun ilk 7 oyuncusu bir sonraki tura yükselir.</div><div class="ilk7" id="ilk7Icerik"></div></section>
+</main>
+<script>
+// Veri adresi: Apps Script yayın adresi. Boşsa yanındaki veri.json okunur (önizleme).
+const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
+const ILK_KAC = 7;
+let V = null, durum = { sekme: 'oyuncu', grup: 1, grupSekme: 'puan', oyuncu: null };
+try { const k = JSON.parse(localStorage.getItem('bm_durum') || '{}'); Object.assign(durum, k); } catch (e) {}
+function kaydet() { try { localStorage.setItem('bm_durum', JSON.stringify(durum)); } catch (e) {} }
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function nrm(s) {
+  return String(s || '').toLocaleLowerCase('tr').replace(/[ıi̇]/g, 'i').replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ö/g, 'o').replace(/ç/g, 'c').replace(/̇/g, '').replace(/\s+/g, ' ').trim();
+}
+function tarihYaz(t) { if (!t) return ''; const [y, m, d] = t.split('-'); return d + '.' + m + '.' + y; }
+function gunYaz(t) {
+  if (!t) return '';
+  const d = new Date(t.replace(' ', 'T'));
+  if (isNaN(d)) return t;
+  return d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' ' + d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ---- veri hazırlama ----
+let OYUNCU = {};   // ad -> {ad, hnd, grup, sira, satir}
+function hazirla(v) {
+  OYUNCU = {};
+  for (const g of v.gruplar) {
+    g.mac = {};   // "a|b" -> [sa, sb, tarih]
+    for (const [t, a, sa, b, sb] of g.maclar) { g.mac[a + '|' + b] = [sa, sb, t]; g.mac[b + '|' + a] = [sb, sa, t]; }
+    for (const [ad, hnd] of g.oyuncular) OYUNCU[ad] = { ad, hnd, grup: g.no, n: ' ' + nrm(ad) };
+    for (const s of g.puan) { const o = OYUNCU[s[1]]; if (o) o.satir = s; }
+  }
+}
+function sonucSinif(a, b) { return a > b ? 'k' : a < b ? 'm' : 'b'; }
+const SONUC_AD = { k: 'Kazandı', m: 'Kaybetti', b: 'Berabere', o: 'Oynanmadı' };
+
+// ---- oyuncu ara ----
+let oneriSec = -1, oneriListe = [];
+function oneriGoster() {
+  const q = nrm($('ara').value);
+  const kutu = $('oneriler');
+  if (!q || !V) { kutu.hidden = true; return; }
+  oneriListe = Object.values(OYUNCU).filter(o => o.n.includes(' ' + q)).sort((a, b) => a.ad.localeCompare(b.ad, 'tr')).slice(0, 30);
+  oneriSec = oneriListe.length === 1 ? 0 : -1;
+  kutu.innerHTML = oneriListe.length
+    ? oneriListe.map((o, i) => `<div data-i="${i}" class="${i === oneriSec ? 'sec' : ''}"><span>${esc(o.ad)}</span><small>${o.grup}. Grup · Hnd ${esc(o.hnd)}</small></div>`).join('')
+    : '<div style="cursor:default;color:var(--muted)">Bu harflerle başlayan oyuncu yok</div>';
+  kutu.hidden = false;
+}
+function oyuncuSec(ad) {
+  durum.oyuncu = ad; kaydet();
+  $('ara').value = ad; $('oneriler').hidden = true; $('ara').blur();
+  oyuncuCiz();
+}
+function oyuncuCiz() {
+  const el = $('oyuncuSonuc');
+  const o = V && durum.oyuncu && OYUNCU[durum.oyuncu];
+  if (!o) { el.innerHTML = ''; return; }
+  const g = V.gruplar.find(x => x.no === o.grup);
+  const s = o.satir || [];
+  const rakipler = g.oyuncular.filter(([ad]) => ad !== o.ad);
+  const oynanan = [], kalan = [];
+  for (const [ad, hnd] of rakipler) {
+    const m = g.mac[o.ad + '|' + ad];
+    (m ? oynanan : kalan).push({ ad, hnd, m });
+  }
+  oynanan.sort((a, b) => (b.m[2] || '').localeCompare(a.m[2] || ''));
+  const satir = r => {
+    const c = r.m ? sonucSinif(r.m[0], r.m[1]) : 'o';
+    return `<div class="mac"><div class="rk">${esc(r.ad)} <small>(${esc(r.hnd)})</small></div>
+      <div class="sk">${r.m ? `<div class="skor">${esc(r.m[0])} - ${esc(r.m[1])}</div>` : ''}<span class="sonuc s-${c}">${SONUC_AD[c]}</span></div>
+      <div class="tr">${r.m ? tarihYaz(r.m[2]) : 'Maç kaldı'}</div></div>`;
+  };
+  el.innerHTML = `<div class="kart">
+    <div class="oyuncu-bas"><span class="ad">${esc(o.ad)}</span>
+      <span class="rozet">Handikap <b>${esc(o.hnd)}</b></span>
+      <span class="rozet"><b>${o.grup}. Grup</b></span>
+      ${s[0] != null ? `<span class="rozet">Sıra <b>${esc(s[0])}</b></span>` : ''}</div>
+    <div class="sayilar">
+      <div class="p"><b>${esc(s[7] ?? 0)}</b><span>Puan</span></div>
+      <div class="k"><b>${esc(s[4] ?? 0)}</b><span>Galibiyet</span></div>
+      <div class="m"><b>${esc(s[6] ?? 0)}</b><span>Mağlubiyet</span></div>
+      <div class="be"><b>${esc(s[5] ?? 0)}</b><span>Beraberlik</span></div>
+    </div>
+    <div class="ipucu" style="margin:0 0 6px">Oynanan ${oynanan.length} · Kalan ${kalan.length} · Averaj <b>${esc(s[10] ?? 0)}</b>
+      · <a href="#" id="grubaGit">${o.grup}. Grubun puan durumu ›</a></div>
+    ${kalan.length ? `<div class="alt-baslik">Kalan maçlar (${kalan.length})</div>${kalan.map(satir).join('')}` : ''}
+    ${oynanan.length ? `<div class="alt-baslik">Oynanan maçlar (${oynanan.length})</div>${oynanan.map(satir).join('')}` : ''}
+  </div>`;
+  $('grubaGit').onclick = e => { e.preventDefault(); durum.grup = o.grup; durum.grupSekme = 'puan'; sekmeAc('gruplar'); };
+}
+
+// ---- gruplar ----
+function grupCiz() {
+  if (!V) return;
+  $('grupCip').innerHTML = V.gruplar.map(g => `<button data-g="${g.no}" class="${g.no === durum.grup ? 'on' : ''}">${g.no}</button>`).join('');
+  const g = V.gruplar.find(x => x.no === durum.grup) || V.gruplar[0];
+  $('grupBaslik').textContent = g.no + '. Grup';
+  document.querySelectorAll('#grupSekme button').forEach(b => b.classList.toggle('on', b.dataset.g === durum.grupSekme));
+  const el = $('grupIcerik');
+  if (durum.grupSekme === 'puan') {
+    el.innerHTML = `<div class="kaydir"><table><thead><tr><th>#</th><th class="ad">Oyuncu</th><th>Hnd</th><th>O</th><th>G</th><th>B</th><th>M</th><th>P</th><th class="gizle-k">Att.</th><th class="gizle-k">Yed.</th><th>Av.</th></tr></thead><tbody>${
+      g.puan.map((s, i) => `<tr class="${i < ILK_KAC ? 'ust7' : ''} ${i === ILK_KAC - 1 ? 'ayrac' : ''}"><td>${esc(s[0])}</td><td class="ad" data-ad="${esc(s[1])}">${esc(s[1])}</td><td>${esc(s[2])}</td><td>${esc(s[3])}</td><td>${esc(s[4])}</td><td>${esc(s[5])}</td><td>${esc(s[6])}</td><td class="p">${esc(s[7])}</td><td class="gizle-k">${esc(s[8])}</td><td class="gizle-k">${esc(s[9])}</td><td>${esc(s[10])}</td></tr>`).join('')
+    }</tbody></table></div><div class="ipucu">Galibiyet 2 puan · Beraberlik 1 · Mağlubiyet 0. Kesikli çizginin üstündeki ilk ${ILK_KAC} oyuncu üst tura çıkar. İsme dokunun, o oyuncunun maçları açılır.</div>`;
+  } else if (durum.grupSekme === 'matris') {
+    const ol = g.oyuncular;
+    el.innerHTML = `<div class="kaydir"><table class="matris"><thead><tr><th class="ad">Oyuncu</th>${ol.map(([ad]) => `<th class="dik">${esc(ad)}</th>`).join('')}</tr></thead><tbody>${
+      ol.map(([a, h]) => `<tr><td class="ad" data-ad="${esc(a)}">${esc(a)} <small style="color:var(--muted);font-weight:400">(${esc(h)})</small></td>${
+        ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; return m ? `<td class="${sonucSinif(m[0], m[1])}">${esc(m[0])}-${esc(m[1])}</td>` : '<td></td>'; }).join('')
+      }</tr>`).join('')
+    }</tbody></table></div><div class="ipucu">Satırdaki oyuncunun skoru solda. Yeşil kazandı, kırmızı kaybetti, mavi berabere.</div>`;
+  } else {
+    const ms = g.maclar.slice().sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
+    el.innerHTML = ms.length ? macListesi(ms) : '<div class="bos">Bu grupta henüz maç oynanmadı.</div>';
+  }
+}
+function macListesi(ms, grupGoster) {
+  let son = null, h = '';
+  for (const m of ms) {
+    const [t, a, sa, b, sb, gno] = m;
+    if (t !== son) { h += `<div class="tarih-baslik">${t ? tarihYaz(t) : 'Tarihsiz'}</div>`; son = t; }
+    const ca = sonucSinif(sa, sb), cb = sonucSinif(sb, sa);
+    h += `<div class="mac" style="grid-template-columns:1fr auto 1fr">
+      <div class="rk" style="text-align:right;color:var(--${ca === 'k' ? 'win' : ca === 'm' ? 'text' : 'draw'})">${esc(a)}</div>
+      <div class="skor" style="padding:0 6px">${esc(sa)} - ${esc(sb)}</div>
+      <div class="rk" style="color:var(--${cb === 'k' ? 'win' : cb === 'm' ? 'text' : 'draw'})">${esc(b)}</div>
+      ${grupGoster ? `<div class="tr" style="grid-column:1 / span 3;text-align:center">${gno}. Grup</div>` : ''}</div>`;
+  }
+  return h;
+}
+function sonCiz() {
+  if (!V) return;
+  const hepsi = [];
+  for (const g of V.gruplar) for (const m of g.maclar) hepsi.push([...m, g.no]);
+  hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
+  $('sonIcerik').innerHTML = hepsi.length ? macListesi(hepsi.slice(0, 60), true) : '<div class="bos">Henüz maç oynanmadı.</div>';
+}
+function ilk7Ciz() {
+  if (!V) return;
+  $('ilk7Icerik').innerHTML = V.gruplar.map(g => `<div class="kart"><h2>${g.no}. Grup</h2><table><tbody>${
+    g.puan.slice(0, ILK_KAC).map(s => `<tr><td style="color:var(--gold);font-weight:700;width:28px">${esc(s[0])}</td><td class="ad" data-ad="${esc(s[1])}">${esc(s[1])}</td><td style="color:var(--muted)">${esc(s[2])}</td><td class="p">${esc(s[7])} P</td><td style="color:var(--muted)">${esc(s[10])}</td></tr>`).join('')
+  }</tbody></table></div>`).join('');
+}
+
+// ---- sekmeler ----
+function sekmeAc(s) {
+  durum.sekme = s; kaydet();
+  document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+  for (const id of ['oyuncu', 'gruplar', 'son', 'ilk7']) $('s-' + id).hidden = id !== s;
+  ciz();
+  window.scrollTo(0, 0);
+}
+function ciz() {
+  if (!V) return;
+  if (durum.sekme === 'oyuncu') oyuncuCiz();
+  else if (durum.sekme === 'gruplar') grupCiz();
+  else if (durum.sekme === 'son') sonCiz();
+  else ilk7Ciz();
+}
+
+// ---- veri yükleme ----
+async function yukle(sessiz) {
+  const adres = VERI_ADRESI || ('veri.json?' + Date.now());
+  try {
+    const r = await fetch(adres, { cache: 'no-store' });
+    const v = await r.json();
+    if (!v || !v.gruplar) throw new Error(v && v.hata ? v.hata : 'Veri henüz yayınlanmadı');
+    try { localStorage.setItem('bm_veri', JSON.stringify(v)); } catch (e) {}
+    uygula(v);
+    $('hata').innerHTML = '';
+  } catch (e) {
+    if (!V) {
+      let eski = null; try { eski = JSON.parse(localStorage.getItem('bm_veri') || 'null'); } catch (x) {}
+      if (eski) { uygula(eski); $('hata').innerHTML = '<div class="hata">İnternete bağlanılamadı, son kaydedilen sonuçlar gösteriliyor.</div>'; }
+      else { $('gun').textContent = ''; $('hata').innerHTML = '<div class="hata">Sonuçlar yüklenemedi. İnternet bağlantınızı kontrol edip ↻ Yenile\'ye dokunun.</div>'; }
+    } else if (!sessiz) { $('hata').innerHTML = '<div class="hata">Yenilenemedi, internet bağlantınızı kontrol edin.</div>'; }
+  }
+}
+function uygula(v) {
+  V = v; hazirla(v);
+  $('gun').textContent = 'Son güncelleme: ' + gunYaz(v.guncelleme);
+  if (durum.oyuncu && !OYUNCU[durum.oyuncu]) durum.oyuncu = null;
+  if (durum.oyuncu && document.activeElement !== $('ara')) $('ara').value = durum.oyuncu;
+  ciz();
+}
+
+// ---- olaylar ----
+$('nav').onclick = e => { const b = e.target.closest('button'); if (b) sekmeAc(b.dataset.s); };
+$('grupCip').onclick = e => { const b = e.target.closest('button'); if (b) { durum.grup = +b.dataset.g; kaydet(); grupCiz(); } };
+$('grupSekme').onclick = e => { const b = e.target.closest('button'); if (b) { durum.grupSekme = b.dataset.g; kaydet(); grupCiz(); } };
+document.addEventListener('click', e => {
+  const td = e.target.closest('td.ad[data-ad]');
+  if (td) { oyuncuSec(td.dataset.ad); sekmeAc('oyuncu'); }
+  if (!e.target.closest('.ara')) $('oneriler').hidden = true;
+});
+$('ara').addEventListener('input', oneriGoster);
+$('ara').addEventListener('focus', () => { if ($('ara').value === durum.oyuncu) $('ara').select(); oneriGoster(); });
+$('ara').addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); if (!oneriListe.length) return;
+    oneriSec = (oneriSec + (e.key === 'ArrowDown' ? 1 : -1) + oneriListe.length) % oneriListe.length;
+    [...$('oneriler').children].forEach((d, i) => d.classList.toggle('sec', i === oneriSec));
+  } else if (e.key === 'Enter') {
+    e.preventDefault(); const o = oneriListe[oneriSec >= 0 ? oneriSec : 0]; if (o) oyuncuSec(o.ad);
+  } else if (e.key === 'Escape') { $('oneriler').hidden = true; }
+});
+$('oneriler').addEventListener('mousedown', e => e.preventDefault());
+$('oneriler').addEventListener('click', e => { const d = e.target.closest('[data-i]'); if (d) oyuncuSec(oneriListe[+d.dataset.i].ad); });
+$('yenile').onclick = () => { $('gun').textContent = 'Yenileniyor…'; yukle(false); };
+setInterval(() => { if (document.visibilityState === 'visible') yukle(true); }, 120000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') yukle(true); });
+
+// ---- ana ekrana ekle ipucu ----
+(function () {
+  const tek = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  let kapali = false; try { kapali = localStorage.getItem('bm_kur') === '1'; } catch (e) {}
+  if (tek || kapali) return;
+  const ua = navigator.userAgent;
+  let m = '';
+  if (/iPhone|iPad|iPod/.test(ua)) m = '<b>Telefona uygulama olarak ekleyin:</b> Safari\'de alttaki <b>Paylaş</b> (□↑) düğmesine, sonra <b>Ana Ekrana Ekle</b>\'ye dokunun.';
+  else if (/Android/.test(ua)) m = '<b>Telefona uygulama olarak ekleyin:</b> Chrome\'da sağ üstteki <b>⋮</b> menüsünden <b>Ana ekrana ekle</b>\'ye dokunun.';
+  if (!m) return;
+  $('kurMetin').innerHTML = m; $('kur').style.display = 'block';
+  $('kurKapat').onclick = () => { $('kur').style.display = 'none'; try { localStorage.setItem('bm_kur', '1'); } catch (e) {} };
+})();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+
+// Doğrudan bağlantı: #o=Ad Soyad (oyuncu), #g6 / #g6-matris / #g6-maclar (grup), #son, #ilk7
+(function () {
+  const h = decodeURIComponent(location.hash.slice(1));
+  let m;
+  if (h.startsWith('o=')) { durum.oyuncu = h.slice(2); durum.sekme = 'oyuncu'; }
+  else if ((m = h.match(/^g(\d+)(?:-(puan|matris|maclar))?$/))) { durum.grup = +m[1]; durum.grupSekme = m[2] || 'puan'; durum.sekme = 'gruplar'; }
+  else if (h === 'son' || h === 'ilk7') durum.sekme = h;
+})();
+sekmeAc(durum.sekme);
+yukle(false);
+</script>
+</body>
+</html>
