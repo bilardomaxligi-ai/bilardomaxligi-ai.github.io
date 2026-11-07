@@ -189,6 +189,7 @@ const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.goo
 const ILK_KAC = 7;
 let V = null, durum = { sekme: 'gruplar', grup: 1, grupSekme: 'puan', oyuncu: null };
 try { const k = JSON.parse(localStorage.getItem('bm_durum') || '{}'); Object.assign(durum, k); } catch (e) {}
+durum.sekme = 'gruplar'; durum.grupSekme = 'puan'; // her açılışta Gruplar → Puan durumu (son bakılan grup hatırlanır)
 function kaydet() { try { localStorage.setItem('bm_durum', JSON.stringify(durum)); } catch (e) {} }
 
 const $ = id => document.getElementById(id);
