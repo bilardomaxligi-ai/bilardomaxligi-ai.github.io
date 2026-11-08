@@ -127,6 +127,7 @@ td.p{font-weight:700;color:var(--gold)}
 .matris tbody tr td.ad{background:#284a72}
 .matris tbody tr:nth-child(even) td.ad{background:#2d5280}
 .matris .mno{display:inline-block;min-width:22px;margin-right:6px;text-align:right;color:var(--gold);font-weight:700}
+.matris .mh{color:var(--muted);font-weight:400;white-space:nowrap}
 .bos{color:var(--muted);text-align:center;padding:24px 8px}
 .hata{background:#3a1a1a;border:1px solid #6b2a2a;color:#ffd0cc;border-radius:10px;padding:12px;margin-bottom:12px}
 .tarih-baslik{font-size:13px;color:var(--gold);font-weight:700;margin:12px 0 2px}
@@ -163,7 +164,8 @@ td.p{font-weight:700;color:var(--gold)}
   .sekme2 button{font-size:13px;padding:10px 4px;white-space:nowrap}
   .cipler{gap:5px} .cipler button{min-width:38px;padding:7px 8px;font-size:14px}
   .matris td.ad,.matris th.ad{font-size:12px;padding:6px 4px 6px 4px}
-  .matris .mad{display:inline-block;max-width:104px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+  .matris .mad{display:inline-block;max-width:96px;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+  .matris .mh{font-size:10.5px}
   .matris .mno{min-width:16px;margin-right:4px}
   .matris td{min-width:40px;font-size:12px;padding:6px 2px}
   .matris thead th.ek,.matris tbody tr td.ek{min-width:36px}
@@ -336,7 +338,7 @@ function grupCiz() {
   } else if (durum.grupSekme === 'matris') {
     const ol = g.oyuncular;
     el.innerHTML = `<div class="kaydir mk"><table class="matris"><thead><tr><th class="ad"><span class="mno">#</span>Oyuncu</th>${ol.map(([ad], j) => `<th class="no" title="${esc(ad)}">${j + 1}</th>`).join('')}<th class="ek ilk">Sıra</th><th class="ek">Puan</th><th class="ek">Averaj</th></tr></thead><tbody>${
-      ol.map(([a, h], i) => `<tr><td class="ad" data-ad="${esc(a)}"><span class="mno">${i + 1}</span><span class="mad">${esc(a)}</span><small class="gizle-k" style="color:var(--muted);font-weight:400"> (${esc(h)})</small></td>${
+      ol.map(([a, h], i) => `<tr><td class="ad" data-ad="${esc(a)}"><span class="mno">${i + 1}</span><span class="mad">${esc(a)}</span><small class="mh"> (${esc(h)})</small></td>${
         ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = g.mac[a + '|' + b]; if (!m) return '<td></td>'; const c1 = sonucSinif(m[0], m[1]), c2 = sonucSinif(m[1], m[0]); return `<td><span class="sk-${c1}">${esc(m[0])}</span><span class="sk-a">-</span><span class="sk-${c2}">${esc(m[1])}</span></td>`; }).join('')
       }${(s => `<td class="ek ilk">${esc(s[0] ?? '')}</td><td class="ek p">${esc(s[7] ?? '')}</td><td class="ek">${esc(s[10] ?? '')}</td>`)(g.puan.find(x => x[1] === a) || [])}</tr>`).join('')
     }</tbody></table></div><div class="ipucu">Satırdaki oyuncunun skoru solda. Galibin sayısı yeşil, mağlubun kırmızı, beraberlik mavi.</div>`;
