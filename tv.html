@@ -40,6 +40,22 @@ td.ust7{color:var(--altin)}
 .bilgi .acik{font-size:calc(var(--u)*1.2);color:var(--soluk);line-height:1.5}
 .bilgi .imza{font-size:calc(var(--u)*1.15);color:var(--soluk)} .bilgi .imza b{color:var(--altin);font-weight:600}
 .hata{position:fixed;left:50%;bottom:1vh;transform:translateX(-50%);background:#3a1a1a;color:#ffd0cc;border:1px solid #6b2a2a;border-radius:.6vh;padding:.5vh 1.2vh;font-size:1.3vh;display:none;z-index:5}
+/* Büyük çapraz tablo: ekranda 4 grup (2×2) ya da 6 grup (3×2), hücrede tam skor */
+.izgara.b4{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.5}
+.izgara.b6{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.05}
+.buyuk .kutu{padding:calc(var(--u)*.6) calc(var(--u)*.8) calc(var(--u)*.5)}
+.buyuk .kutu h2{font-size:calc(var(--u)*var(--carp)*1.75);margin-bottom:calc(var(--u)*.4)}
+.buyuk .kutu h2 span{font-size:calc(var(--u)*var(--carp)*1.2)}
+.buyuk th,.buyuk td{font-size:calc(var(--u)*var(--carp))}
+.buyuk th{height:calc(var(--u)*var(--carp)*1.5)}
+.buyuk td.ad{font-size:calc(var(--u)*var(--carp)*1.2)}
+.buyuk td.sk2{font-weight:700;letter-spacing:-.02em}
+.buyuk th,.buyuk td{border-left-color:#2c5078}
+.buyuk td.no,.buyuk th:first-child{border-left:0}
+.buyuk td.sk2 .k{color:var(--k)} .buyuk td.sk2 .m{color:var(--m)} .buyuk td.sk2 .b{color:var(--b)}
+.buyuk .bilgi .bm{height:calc(var(--u)*12)} .buyuk .bilgi .ad{font-size:calc(var(--u)*3.4)}
+.buyuk .bilgi .sp{font-size:calc(var(--u)*1.9)} .buyuk .bilgi .sp img{height:calc(var(--u)*3.2)}
+.buyuk .bilgi .gun{font-size:calc(var(--u)*2)} .buyuk .bilgi .acik{font-size:calc(var(--u)*1.6)} .buyuk .bilgi .imza{font-size:calc(var(--u)*1.5)}
 /* Slayt gösterisi: toplu çapraz tablo → grup grup puan durumu → son maçlar */
 .slayt{position:fixed;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none;overflow:hidden}
 .slayt.on{opacity:1}
@@ -92,7 +108,28 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const sinif = (a, b) => a > b ? 'k' : a < b ? 'm' : 'b';
 function tarihYaz(s) { const m = /^(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d)/.exec(s || ''); return m ? `${m[3]}.${m[2]}.${m[1]} ${m[4]}` : (s || ''); }
 
-function matrisCiz(V) {
+// Büyük çapraz tablo (ekranda 4 ya da 6 grup): hücrede telefondaki gibi tam skor, ör. 40-50 (satırdaki oyuncunun sayısı solda)
+function buyukKutu(g) {
+  const mac = {};
+  for (const [t, a, sa, b, sb] of g.maclar) { mac[a + '|' + b] = [sa, sb]; mac[b + '|' + a] = [sb, sa]; }
+  const ol = g.oyuncular, n = ol.length;
+  const basl = `<tr><th style="width:calc(var(--u)*2.6)">#</th><th class="ad" style="width:19%">Oyuncu</th><th style="width:calc(var(--u)*2.8)">H</th>${ol.map((_, j) => `<th>${j + 1}</th>`).join('')}</tr>`;
+  const satir = ol.map(([a, h], i) => {
+    const hucre = ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = mac[a + '|' + b]; return m ? `<td class="sk2"><span class="${sinif(m[0], m[1])}">${esc(m[0])}</span>-<span class="${sinif(m[1], m[0])}">${esc(m[1])}</span></td>` : '<td></td>'; }).join('');
+    return `<tr><td class="no">${i + 1}</td><td class="ad">${esc(a)}</td><td class="h">${esc(h)}</td>${hucre}</tr>`;
+  }).join('');
+  return `<div class="kutu"><h2>${g.no}. Grup<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table>${basl}${satir}</table></div>`;
+}
+function matrisCiz(V, sayfa) {
+  const iz = document.getElementById('izgara');
+  if (GRUP < 15) {
+    const gr = V.gruplar.slice(0, 15).slice(sayfa * GRUP, sayfa * GRUP + GRUP);
+    const kutular = gr.map(buyukKutu);
+    if (kutular.length < GRUP) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">Hücrede satırdaki oyuncunun skoru solda · <span class="k">galibiyet</span> · <span class="m">mağlubiyet</span> · <span class="b">beraberlik</span><br>H: handikap</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
+    iz.className = 'izgara buyuk b' + GRUP; iz.innerHTML = kutular.join('');
+    return;
+  }
+  iz.className = 'izgara';
   const kutular = V.gruplar.slice(0, 15).map(g => {
     const mac = {};
     for (const [t, a, sa, b, sb] of g.maclar) { mac[a + '|' + b] = [sa, sb]; mac[b + '|' + a] = [sb, sa]; }
@@ -108,16 +145,18 @@ function matrisCiz(V) {
     return `<div class="kutu"><h2>${g.no}. Grup<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table>${basl}${satir}</table></div>`;
   });
   kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">Hücrede satırdaki oyuncunun sayısı · <span class="k">galibiyet</span> · <span class="m">mağlubiyet</span> · <span class="b">beraberlik</span><br>H: handikap · S: sıra (altın: ilk ${ILK_KAC}) · P: puan · Av: averaj</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
-  document.getElementById('izgara').innerHTML = kutular.join('');
+  iz.innerHTML = kutular.join('');
 }
 
 // ---- Slayt gösterisi ----
 // Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
-// Adres sonuna ?sabit eklenirse yalnızca toplu çapraz tablo gösterilir (eski davranış).
+// Çapraz tablo bir ekranda 4 grup gösterir (hücrede 40-50). ?grup=6 → 6 grup (65" 4K için), ?grup=15 → 15 grup tek ekran.
+// Adres sonuna ?sabit eklenirse yalnızca 15 grubun toplu çapraz tablosu sabit gösterilir.
 const SURE = { matris: 180, puan: 15, son: 60 };
 const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
 const P = new URLSearchParams(location.search);
 const SABIT = P.has('sabit'), HIZ = Math.max(1, +P.get('hiz') || 1);
+const GRUP = SABIT ? 15 : ([4, 6, 15].includes(+P.get('grup')) ? +P.get('grup') : 4);
 const $ = id => document.getElementById(id);
 let V = null, sira = [], idx = -1, zaman = null;
 
@@ -130,7 +169,8 @@ function sonMaclar() {
   return hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
 }
 function plan() {
-  const s = [{ t: 'matris', sn: SURE.matris }];
+  const s = [], ms = Math.ceil(15 / GRUP);
+  for (let i = 0; i < ms; i++) s.push({ t: 'matris', sayfa: i, sn: Math.round(SURE.matris / ms) });
   if (SABIT) return s;
   for (const g of V.gruplar.slice(0, 15)) s.push({ t: 'puan', g: g.no, sn: SURE.puan });
   const n = Math.min(SON_EN_FAZLA_SAYFA, Math.ceil(sonMaclar().length / SON_SAYFA));
@@ -159,7 +199,7 @@ function sonCiz(sayfa, top) {
     : '<div class="bosmesaj">Son 7 günde oynanan maç yok</div>';
 }
 function icerikCiz(s) {
-  if (s.t === 'matris') matrisCiz(V);
+  if (s.t === 'matris') matrisCiz(V, s.sayfa || 0);
   else if (s.t === 'puan') puanCiz(s.g);
   else sonCiz(s.sayfa, s.top);
 }
@@ -169,9 +209,10 @@ function goster() {
   const bar = $('ilerle'); bar.style.transition = 'none'; bar.style.width = '0';
   void bar.offsetWidth; bar.style.transition = `width ${s.sn / HIZ}s linear`; bar.style.width = '100%';
   const mat = $('s-matris'), dig = $('s-diger');
-  if (s.t === 'matris') { icerikCiz(s); dig.classList.remove('on'); mat.classList.add('on'); }
-  else if (dig.classList.contains('on')) { dig.classList.remove('on'); setTimeout(() => { icerikCiz(s); dig.classList.add('on'); }, 600); }
-  else { icerikCiz(s); mat.classList.remove('on'); dig.classList.add('on'); }
+  // Aynı tür slayt arka arkaya gelirse önce kararır, sonra yeni içerikle açılır
+  const hedef = s.t === 'matris' ? mat : dig, diger = hedef === mat ? dig : mat;
+  if (hedef.classList.contains('on')) { hedef.classList.remove('on'); setTimeout(() => { icerikCiz(s); hedef.classList.add('on'); }, 600); }
+  else { icerikCiz(s); diger.classList.remove('on'); hedef.classList.add('on'); }
   zaman = setTimeout(() => ilerle(1), s.sn * 1000 / HIZ);
 }
 function ilerle(y) {
