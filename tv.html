@@ -26,6 +26,10 @@ td.ek{background:#0b1a2a;font-weight:700} td.p{color:var(--altin)} td.ilk{border
 tr:nth-child(even) td:not(.x):not(.ek){background:#132940}
 .k{color:var(--k);font-weight:700} .m{color:var(--m);font-weight:700} .b{color:var(--b);font-weight:700}
 td.ust7{color:var(--altin)}
+/* Çapraz tabloda sonuç hücresi renkli kutu: yeşil galibiyet, kırmızı mağlubiyet, mavi beraberlik */
+.kutu tr td.k:not(.x):not(.ek){background:#127a3e;color:#fff}
+.kutu tr td.m:not(.x):not(.ek){background:#8c2626;color:#fff}
+.kutu tr td.b:not(.x):not(.ek){background:#1f5ea8;color:#fff}
 /* 16. kutu: bilgi */
 .bilgi{align-items:center;justify-content:center;text-align:center;gap:calc(var(--u)*.6);background:radial-gradient(circle at 50% 35%,#16304d 0%,#0b1726 80%)}
 .bilgi .bm{height:calc(var(--u)*7.5);border-radius:calc(var(--u)*.8)}
@@ -35,11 +39,51 @@ td.ust7{color:var(--altin)}
 .bilgi .gun{font-size:calc(var(--u)*1.45);color:var(--yazi);font-weight:600}
 .bilgi .acik{font-size:calc(var(--u)*1.2);color:var(--soluk);line-height:1.5}
 .bilgi .imza{font-size:calc(var(--u)*1.15);color:var(--soluk)} .bilgi .imza b{color:var(--altin);font-weight:600}
-.hata{position:fixed;left:50%;bottom:1vh;transform:translateX(-50%);background:#3a1a1a;color:#ffd0cc;border:1px solid #6b2a2a;border-radius:.6vh;padding:.5vh 1.2vh;font-size:1.3vh;display:none}
+.hata{position:fixed;left:50%;bottom:1vh;transform:translateX(-50%);background:#3a1a1a;color:#ffd0cc;border:1px solid #6b2a2a;border-radius:.6vh;padding:.5vh 1.2vh;font-size:1.3vh;display:none;z-index:5}
+/* Slayt gösterisi: toplu çapraz tablo → grup grup puan durumu → son maçlar */
+.slayt{position:fixed;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none;overflow:hidden}
+.slayt.on{opacity:1}
+.ilerle{position:fixed;left:0;bottom:0;height:calc(var(--u)*.45);width:0;background:var(--altin);opacity:.85;z-index:4}
+#s-diger{display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 0%,#11263d 0%,var(--bg) 70%)}
+.bas{display:flex;align-items:center;gap:calc(var(--u)*1.6);padding:calc(var(--u)*1.2) calc(var(--u)*3) calc(var(--u)*1);border-bottom:2px solid var(--cizgi)}
+.bas>img{height:calc(var(--u)*6.4);border-radius:calc(var(--u)*.7)}
+.bas .bt{display:flex;flex-direction:column;min-width:0}
+.bas .bt small{font-size:calc(var(--u)*1.8);color:var(--soluk);font-weight:600}
+.bas .bt b{font-size:calc(var(--u)*3.7);color:var(--altin);line-height:1.1;white-space:nowrap}
+.bas .sag{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:calc(var(--u)*.5);font-size:calc(var(--u)*1.9);color:var(--soluk);font-weight:600;white-space:nowrap}
+.bas .sag .ek{font-size:calc(var(--u)*2.4);color:var(--yazi);font-weight:700}
+.bas .spn{display:flex;align-items:center;gap:calc(var(--u)*.6);font-style:italic;font-size:calc(var(--u)*1.6)}
+.bas .spn img{height:calc(var(--u)*2.5)}
+#icerik{flex:1;min-height:0;padding:calc(var(--u)*1.2) calc(var(--u)*3) calc(var(--u)*1.6)}
+.pt{width:100%;height:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
+.pt th{font-size:calc(var(--u)*2);color:var(--altin);font-weight:700;padding-bottom:calc(var(--u)*.6);border:0;border-bottom:2px solid var(--cizgi);height:auto}
+.pt td{font-size:calc(var(--u)*2.9);font-weight:700;border:0;border-bottom:1px solid #1b3350;text-align:center}
+.pt th.ad,.pt td.ad{text-align:left;padding-left:calc(var(--u)*1.2);font-size:calc(var(--u)*2.9)}
+.pt th.ad{font-size:calc(var(--u)*2)}
+.pt tbody tr:nth-child(even) td{background:#0e2136}
+.pt td.sira{color:var(--soluk)} .pt tr.ust td.sira{color:var(--altin)}
+.pt tr.ayrac td{border-bottom:3px solid var(--altin)}
+.pt td.p{color:var(--altin);font-size:calc(var(--u)*3.2)}
+.pt td.hh,.pt td.ikincil{color:var(--soluk);font-weight:600}
+.sm{display:grid;grid-auto-flow:column;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(16,minmax(0,1fr));column-gap:calc(var(--u)*2.4);height:100%}
+.mc{display:grid;grid-template-columns:calc(var(--u)*5.4) calc(var(--u)*5.6) minmax(0,1fr) calc(var(--u)*3.4) calc(var(--u)*1.4) calc(var(--u)*3.4) minmax(0,1fr);align-items:center;font-size:calc(var(--u)*2.05);font-weight:700;border-bottom:1px solid #1b3350;min-height:0}
+.mc:nth-child(even){background:#0e2136}
+.mc .tr{color:var(--soluk);font-weight:600;font-size:calc(var(--u)*1.75);padding-left:calc(var(--u)*.5)}
+.mc .gr{color:var(--altin);font-size:calc(var(--u)*1.75);white-space:nowrap}
+.mc .o1,.mc .o2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc .o1{text-align:right;padding-right:calc(var(--u)*.6)} .mc .o2{padding-left:calc(var(--u)*.6)}
+.mc .sk{text-align:center;font-size:calc(var(--u)*2.3)} .mc .ay{text-align:center;color:var(--soluk)}
+.bosmesaj{height:100%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3);color:var(--soluk)}
 </style>
 </head>
 <body>
-<div class="izgara" id="izgara"></div>
+<div class="slayt" id="s-matris"><div class="izgara" id="izgara"></div></div>
+<div class="slayt" id="s-diger">
+  <header class="bas"><img src="logo.png" alt=""><div class="bt"><small>25. Bilardomax Ligi</small><b id="baslik"></b></div>
+  <div class="sag"><span class="ek" id="ek"></span><span id="saat"></span><span class="spn">sponsored by <img src="marmatek.png" alt="Marmatek"></span></div></header>
+  <main id="icerik"></main>
+</div>
+<div class="ilerle" id="ilerle"></div>
 <div class="hata" id="hata">Bağlantı yok, son veriler gösteriliyor</div>
 <script>
 const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
@@ -48,7 +92,7 @@ const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '
 const sinif = (a, b) => a > b ? 'k' : a < b ? 'm' : 'b';
 function tarihYaz(s) { const m = /^(\d{4})-(\d\d)-(\d\d) (\d\d:\d\d)/.exec(s || ''); return m ? `${m[3]}.${m[2]}.${m[1]} ${m[4]}` : (s || ''); }
 
-function ciz(V) {
+function matrisCiz(V) {
   const kutular = V.gruplar.slice(0, 15).map(g => {
     const mac = {};
     for (const [t, a, sa, b, sb] of g.maclar) { mac[a + '|' + b] = [sa, sb]; mac[b + '|' + a] = [sb, sa]; }
@@ -67,19 +111,98 @@ function ciz(V) {
   document.getElementById('izgara').innerHTML = kutular.join('');
 }
 
+// ---- Slayt gösterisi ----
+// Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
+// Adres sonuna ?sabit eklenirse yalnızca toplu çapraz tablo gösterilir (eski davranış).
+const SURE = { matris: 180, puan: 15, son: 60 };
+const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
+const P = new URLSearchParams(location.search);
+const SABIT = P.has('sabit'), HIZ = Math.max(1, +P.get('hiz') || 1);
+const $ = id => document.getElementById(id);
+let V = null, sira = [], idx = -1, zaman = null;
+
+function sonMaclar() {
+  // Ana sitedeki "Son maçlar" ile aynı: bugün ve önceki 6 gün, en yenisi önce
+  const d = new Date(); d.setDate(d.getDate() - 6);
+  const sinir = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const hepsi = [];
+  for (const g of V.gruplar) for (const m of g.maclar) if (m[0] && m[0] >= sinir) hepsi.push([...m, g.no]);
+  return hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
+}
+function plan() {
+  const s = [{ t: 'matris', sn: SURE.matris }];
+  if (SABIT) return s;
+  for (const g of V.gruplar.slice(0, 15)) s.push({ t: 'puan', g: g.no, sn: SURE.puan });
+  const n = Math.min(SON_EN_FAZLA_SAYFA, Math.ceil(sonMaclar().length / SON_SAYFA));
+  for (let i = 0; i < n; i++) s.push({ t: 'son', sayfa: i, top: n, sn: Math.max(15, Math.round(SURE.son / n)) });
+  return s;
+}
+function saatYaz() { const d = new Date(); $('saat').textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+
+function puanCiz(no) {
+  const g = V.gruplar.find(x => x.no === no); if (!g) return;
+  const n = g.oyuncular.length;
+  $('baslik').textContent = `${g.no}. Grup · Puan Durumu`;
+  $('ek').textContent = `${g.maclar.length} / ${n * (n - 1) / 2} maç oynandı`;
+  const av = v => v > 0 ? 'k' : v < 0 ? 'm' : '';
+  $('icerik').innerHTML = `<table class="pt"><thead><tr><th style="width:6%">Sıra</th><th class="ad" style="width:30%">Oyuncu</th><th>Hnd</th><th>O</th><th>G</th><th>B</th><th>M</th><th>Puan</th><th>Attığı</th><th>Yediği</th><th>Averaj</th></tr></thead><tbody>${
+    g.puan.map((s, i) => `<tr class="${i < ILK_KAC ? 'ust' : ''} ${i === ILK_KAC - 1 ? 'ayrac' : ''}"><td class="sira">${esc(s[0])}</td><td class="ad">${esc(s[1])}</td><td class="hh">${esc(s[2])}</td><td>${esc(s[3])}</td><td>${esc(s[4])}</td><td>${esc(s[5])}</td><td>${esc(s[6])}</td><td class="p">${esc(s[7])}</td><td class="ikincil">${esc(s[8])}</td><td class="ikincil">${esc(s[9])}</td><td class="${av(s[10])}">${esc(s[10])}</td></tr>`).join('')
+  }</tbody></table>`;
+}
+function sonCiz(sayfa, top) {
+  const ms = sonMaclar(), parca = ms.slice(sayfa * SON_SAYFA, (sayfa + 1) * SON_SAYFA);
+  $('baslik').textContent = 'Son Maçlar · Son 7 gün';
+  $('ek').textContent = top > 1 ? `Sayfa ${sayfa + 1} / ${top}` : `${ms.length} maç`;
+  const tr = t => { const m = /^\d{4}-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[2]}.${m[1]}` : ''; };
+  $('icerik').innerHTML = parca.length ? `<div class="sm">${parca.map(([t, a, sa, b, sb, gno]) =>
+    `<div class="mc"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Gr</span><span class="o1">${esc(a)}</span><span class="sk ${sinif(sa, sb)}">${esc(sa)}</span><span class="ay">–</span><span class="sk ${sinif(sb, sa)}">${esc(sb)}</span><span class="o2">${esc(b)}</span></div>`).join('')}</div>`
+    : '<div class="bosmesaj">Son 7 günde oynanan maç yok</div>';
+}
+function icerikCiz(s) {
+  if (s.t === 'matris') matrisCiz(V);
+  else if (s.t === 'puan') puanCiz(s.g);
+  else sonCiz(s.sayfa, s.top);
+}
+function goster() {
+  clearTimeout(zaman);
+  const s = sira[idx];
+  const bar = $('ilerle'); bar.style.transition = 'none'; bar.style.width = '0';
+  void bar.offsetWidth; bar.style.transition = `width ${s.sn / HIZ}s linear`; bar.style.width = '100%';
+  const mat = $('s-matris'), dig = $('s-diger');
+  if (s.t === 'matris') { icerikCiz(s); dig.classList.remove('on'); mat.classList.add('on'); }
+  else if (dig.classList.contains('on')) { dig.classList.remove('on'); setTimeout(() => { icerikCiz(s); dig.classList.add('on'); }, 600); }
+  else { icerikCiz(s); mat.classList.remove('on'); dig.classList.add('on'); }
+  zaman = setTimeout(() => ilerle(1), s.sn * 1000 / HIZ);
+}
+function ilerle(y) {
+  if (!V) return;
+  const yeni = idx + y;
+  if (idx < 0 || yeni >= sira.length || yeni < 0) { sira = plan(); idx = yeni < 0 ? sira.length - 1 : 0; }
+  else idx = yeni;
+  goster();
+}
+
 let sonVeri = '';
+function veriGeldi(metin) {
+  V = JSON.parse(metin);
+  if (idx < 0) { const b = +P.get('slayt') || 0; sira = plan(); idx = Math.min(b, sira.length - 1); goster(); }
+  else if (sira[idx] && (sira[idx].t !== 'son' || sira[idx].sayfa * SON_SAYFA < sonMaclar().length)) icerikCiz(sira[idx]);   // ekrandaki slaytı yeni skorlarla tazele
+}
 async function yukle() {
   try {
     const r = await fetch(VERI_ADRESI ? VERI_ADRESI + '?t=' + Date.now() : 'veri.json?' + Date.now(), { cache: 'no-store' });
-    const metin = await r.text(); const V = JSON.parse(metin);
-    if (metin !== sonVeri) { sonVeri = metin; ciz(V); try { localStorage.setItem('bm_tv', metin); } catch (e) {} }
-    document.getElementById('hata').style.display = 'none';
+    const metin = await r.text(); JSON.parse(metin);
+    if (metin !== sonVeri) { sonVeri = metin; veriGeldi(metin); try { localStorage.setItem('bm_tv', metin); } catch (e) {} }
+    $('hata').style.display = 'none';
   } catch (e) {
-    document.getElementById('hata').style.display = 'block';
-    if (!sonVeri) { try { const k = localStorage.getItem('bm_tv'); if (k) { sonVeri = k; ciz(JSON.parse(k)); } } catch (x) {} }
+    $('hata').style.display = 'block';
+    if (!sonVeri) { try { const k = localStorage.getItem('bm_tv'); if (k) { sonVeri = k; veriGeldi(k); } } catch (x) {} }
   }
 }
+saatYaz(); setInterval(saatYaz, 10000);
 yukle(); setInterval(yukle, YENILE_SN * 1000);
+// Kumanda / klavye: sağ-sol ok ile sonraki-önceki slayt
+document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') ilerle(1); else if (e.key === 'ArrowLeft') ilerle(-1); });
 // Güvenlik için her 6 saatte bir sayfayı tamamen yenile (bellek, olası takılma)
 setTimeout(() => location.reload(), 6 * 3600 * 1000);
 // Ekran kararmasın (destekleyen tarayıcılarda)
