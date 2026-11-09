@@ -10,7 +10,7 @@
 /* --u: ekranın hem enine hem boyuna sığan birim (16:9). Her şey buna göre ölçeklenir, sayfa asla ekrandan taşmaz. */
 :root{--bg:#050b14;--kutu:#0c1a2b;--cizgi:#2b4c70;--yazi:#ffffff;--soluk:#a9bdd2;--altin:#ffc24a;--k:#3dff8e;--m:#ff6b61;--b:#7cc0ff;--u:min(1vh,.5625vw)}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--yazi);font-family:"Segoe UI",Roboto,Arial,sans-serif;cursor:none}
-.izgara{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:calc(var(--u)*.45);width:100vw;height:100vh;box-sizing:border-box;padding:calc(var(--u)*.45);overflow:hidden}
+.izgara{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr));gap:calc(var(--u)*.45);width:100vw;height:100%;box-sizing:border-box;padding:calc(var(--u)*.45);overflow:hidden}
 .kutu{background:var(--kutu);border:1px solid var(--cizgi);border-radius:calc(var(--u)*.6);padding:calc(var(--u)*.35) calc(var(--u)*.45) calc(var(--u)*.25);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
 .kutu h2{margin:0 0 calc(var(--u)*.15);font-size:calc(var(--u)*1.55);line-height:1.1;color:var(--altin);display:flex;justify-content:space-between;align-items:baseline}
 .kutu h2 span{color:var(--soluk);font-weight:600;font-size:calc(var(--u)*1.3)}
@@ -39,7 +39,18 @@ td.ust7{color:var(--altin)}
 .bilgi .gun{font-size:calc(var(--u)*1.45);color:var(--yazi);font-weight:600}
 .bilgi .acik{font-size:calc(var(--u)*1.2);color:var(--soluk);line-height:1.5}
 .bilgi .imza{font-size:calc(var(--u)*1.15);color:var(--soluk)} .bilgi .imza b{color:var(--altin);font-weight:600}
-.hata{position:fixed;left:50%;bottom:1vh;transform:translateX(-50%);background:#3a1a1a;color:#ffd0cc;border:1px solid #6b2a2a;border-radius:.6vh;padding:.5vh 1.2vh;font-size:1.3vh;display:none;z-index:5}
+.hata{position:fixed;left:50%;bottom:calc(var(--sh) + 1vh);transform:translateX(-50%);background:#3a1a1a;color:#ffd0cc;border:1px solid #6b2a2a;border-radius:.6vh;padding:.5vh 1.2vh;font-size:1.3vh;display:none;z-index:5}
+/* Alttaki kayan son maçlar şeridi */
+:root{--sh:calc(var(--u)*4.4)}
+.serit{position:fixed;left:0;right:0;bottom:0;height:var(--sh);display:flex;align-items:stretch;background:#08182a;border-top:2px solid var(--altin);overflow:hidden;z-index:3}
+.serit .etiket{flex:none;display:flex;align-items:center;padding:0 calc(var(--u)*1.4);background:var(--altin);color:#1a1200;font-weight:800;font-size:calc(var(--u)*1.8);letter-spacing:.04em;box-shadow:calc(var(--u)*.6) 0 calc(var(--u)*1) rgba(0,0,0,.5);z-index:1}
+.serit .yol{flex:1;position:relative;overflow:hidden}
+.serit .ic{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;white-space:nowrap;will-change:transform}
+.serit .si{font-size:calc(var(--u)*2.2);font-weight:700;padding:0 calc(var(--u)*1.1)}
+.serit .si .tr{color:var(--soluk);font-weight:600;margin-right:.45em}
+.serit .si .gr{color:var(--altin);margin-right:.45em}
+.serit .si .k{color:var(--k)} .serit .si .m{color:var(--m)} .serit .si .b{color:var(--b)}
+.serit .ay{color:var(--altin);font-size:calc(var(--u)*1.3)}
 /* Büyük çapraz tablo: ekranda 4 grup (2×2) ya da 6 grup (3×2), hücrede tam skor */
 .izgara.b4{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.5}
 .izgara.b6{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.05}
@@ -57,9 +68,9 @@ td.ust7{color:var(--altin)}
 .buyuk .bilgi .sp{font-size:calc(var(--u)*1.9)} .buyuk .bilgi .sp img{height:calc(var(--u)*3.2)}
 .buyuk .bilgi .gun{font-size:calc(var(--u)*2)} .buyuk .bilgi .acik{font-size:calc(var(--u)*1.6)} .buyuk .bilgi .imza{font-size:calc(var(--u)*1.5)}
 /* Slayt gösterisi: toplu çapraz tablo → grup grup puan durumu → son maçlar */
-.slayt{position:fixed;inset:0;opacity:0;transition:opacity .6s ease;pointer-events:none;overflow:hidden}
+.slayt{position:fixed;top:0;left:0;right:0;bottom:var(--sh);opacity:0;transition:opacity .6s ease;pointer-events:none;overflow:hidden}
 .slayt.on{opacity:1}
-.ilerle{position:fixed;left:0;bottom:0;height:calc(var(--u)*.45);width:0;background:var(--altin);opacity:.85;z-index:4}
+.ilerle{position:fixed;left:0;bottom:var(--sh);height:calc(var(--u)*.45);width:0;background:var(--altin);opacity:.85;z-index:4}
 #s-diger{display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 0%,#11263d 0%,var(--bg) 70%)}
 .bas{display:flex;align-items:center;gap:calc(var(--u)*1.6);padding:calc(var(--u)*1.2) calc(var(--u)*3) calc(var(--u)*1);border-bottom:2px solid var(--cizgi)}
 .bas>img{height:calc(var(--u)*6.4);border-radius:calc(var(--u)*.7)}
@@ -100,6 +111,7 @@ td.ust7{color:var(--altin)}
   <main id="icerik"></main>
 </div>
 <div class="ilerle" id="ilerle"></div>
+<div class="serit"><div class="etiket">SON MAÇLAR</div><div class="yol"><div class="ic" id="seritIc"></div></div></div>
 <div class="hata" id="hata">Bağlantı yok, son veriler gösteriliyor</div>
 <script>
 const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
@@ -224,9 +236,36 @@ function ilerle(y) {
   goster();
 }
 
+// ---- Alttaki kayan şerit: son 7 günün maçları, en yenisi önce ----
+const SERIT_HIZ = 14;   // saniyede kaç birim kayar (1080p ekranda ≈ 150 piksel/sn)
+let seritX = 0, seritYarim = 0, seritSon = 0;
+function seritCiz() {
+  const ic = $('seritIc'), ms = sonMaclar();
+  if (!ms.length) { ic.innerHTML = '<span class="si">Son 7 günde oynanan maç yok</span>'; seritYarim = 0; seritX = 0; ic.style.transform = 'translate3d(0,0,0)'; return; }
+  const tr = t => { const m = /^\d{4}-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[2]}.${m[1]}` : ''; };
+  const parca = ms.map(([t, a, sa, b, sb, gno]) =>
+    `<span class="si"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Gr</span>${esc(a)} <span class="${sinif(sa, sb)}">${esc(sa)}</span>-<span class="${sinif(sb, sa)}">${esc(sb)}</span> ${esc(b)}</span><span class="ay">●</span>`).join('');
+  // Liste ekrandan kısaysa ekranı dolduracak kadar tekrarla; sonra iki kopya yan yana koy ki kesintisiz dönsün
+  ic.innerHTML = parca; const w = ic.scrollWidth || 1, r = Math.max(1, Math.ceil(ic.parentElement.clientWidth / w));
+  const birim = parca.repeat(r); ic.innerHTML = birim + birim;
+  seritYarim = w * r; if (seritX >= seritYarim) seritX = 0;
+}
+function seritAdim(t) {
+  if (seritYarim > 0 && seritSon) {
+    const u = Math.min(innerHeight, innerWidth * .5625) / 100;
+    seritX += Math.min(.1, (t - seritSon) / 1000) * SERIT_HIZ * u;
+    if (seritX >= seritYarim) seritX -= seritYarim;
+    $('seritIc').style.transform = `translate3d(${-seritX}px,0,0)`;
+  }
+  seritSon = t; requestAnimationFrame(seritAdim);
+}
+requestAnimationFrame(seritAdim);
+addEventListener('resize', () => { if (V) seritCiz(); });
+
 let sonVeri = '';
 function veriGeldi(metin) {
   V = JSON.parse(metin);
+  seritCiz();
   if (idx < 0) { const b = +P.get('slayt') || 0; sira = plan(); idx = Math.min(b, sira.length - 1); goster(); }
   else if (sira[idx] && (sira[idx].t !== 'son' || sira[idx].sayfa * SON_SAYFA < sonMaclar().length)) icerikCiz(sira[idx]);   // ekrandaki slaytı yeni skorlarla tazele
 }
