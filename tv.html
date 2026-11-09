@@ -152,7 +152,7 @@ function matrisCiz(V, sayfa) {
 // Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
 // Çapraz tablo bir ekranda 4 grup gösterir (hücrede 40-50). ?grup=6 → 6 grup (65" 4K için), ?grup=15 → 15 grup tek ekran.
 // Adres sonuna ?sabit eklenirse yalnızca 15 grubun toplu çapraz tablosu sabit gösterilir.
-const SURE = { matris: 20, puan: 15, son: 60 };   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
+const SURE = { matris: 5, puan: 15, son: 60 };   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
 const SADECE_MATRIS = true;   // true: yalnızca çapraz tablo slaytları döner (puan durumu ve son maçlar kapalı)
 const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
 const P = new URLSearchParams(location.search);
