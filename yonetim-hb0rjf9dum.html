@@ -102,6 +102,7 @@ dialog p{margin:4px 0 0;line-height:1.45}
           <div class="skor"><div class="ad" id="sAd2"></div><input id="sS2" type="number" inputmode="numeric" min="0" max="999"></div>
           <label for="sTarih">Tarih</label><input id="sTarih" type="date">
           <button class="btn" id="sKaydet">Kaydet</button>
+          <button class="btn ikincil" id="sVazgec">Vazgeç (kaydetmeden temizle)</button>
           <button class="btn sil gizli" id="sSil">Bu maçı sil</button>
         </div>
       </div>
@@ -283,6 +284,7 @@ $('sKaydet').onclick = async () => {
   const c = await islem({ islem: 'macKaydet', g: +$('sGrup').value, a: $('sO1').value, b: $('sO2').value, sa: +sa, sb: +sb, t: $('sTarih').value });
   if (c) { $('sO2').value = ''; temizle(); skorCiz(); }
 };
+$('sVazgec').onclick = () => { $('sO1').value = ''; $('sO2').value = ''; $('sS1').value = ''; $('sS2').value = ''; temizle(); skorCiz(); window.scrollTo(0, 0); tost('Seçim temizlendi, hiçbir şey kaydedilmedi'); };
 $('sSil').onclick = async () => {
   const a = $('sO1').value, b = $('sO2').value;
   if (!await onayla(`${a} – ${b} maçı silinsin mi?`)) return;
