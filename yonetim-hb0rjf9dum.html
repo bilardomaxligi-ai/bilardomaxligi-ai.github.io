@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0b1726">
+<title>Bilardomax Yönetim</title>
+<link rel="icon" href="favicon.png">
+<style>
+/* Bilardomax Ligi yönetim sayfası: skor girişi, maç düzeltme, oyuncu adı ve handikap. Bağlantısı yayınlanmaz, şifreyle girilir. */
+:root{--bg:#0b1726;--kart:#12243a;--kart2:#173050;--cizgi:#29486a;--yazi:#eef3f8;--soluk:#93a8bf;--altin:#e0b04a;--yesil:#3ddc84;--kirmizi:#ff6b61;--mavi:#6fb3ff}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--yazi);font-family:"Segoe UI",Roboto,Arial,sans-serif;font-size:16px}
+body{padding:env(safe-area-inset-top) 0 calc(80px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:#0e1d30;border-bottom:1px solid var(--cizgi);padding:10px 14px;display:flex;align-items:center;gap:10px}
+header img{height:38px;border-radius:6px}
+header .bas{flex:1;min-width:0}
+header b{display:block;color:var(--altin);font-size:17px}
+header small{color:var(--soluk);font-size:12px}
+header button{background:none;border:1px solid var(--cizgi);color:var(--yazi);border-radius:8px;padding:6px 10px;font-size:13px}
+main{max-width:640px;margin:0 auto;padding:12px}
+.kart{background:var(--kart);border:1px solid var(--cizgi);border-radius:12px;padding:14px;margin-bottom:12px}
+h2{margin:0 0 12px;font-size:17px;color:var(--altin)}
+label{display:block;font-size:13px;color:var(--soluk);margin:10px 0 4px}
+select,input{width:100%;background:#0b1a2c;color:var(--yazi);border:1px solid var(--cizgi);border-radius:9px;padding:11px 12px;font-size:16px}
+select:focus,input:focus{outline:2px solid var(--altin);outline-offset:0}
+button{font:inherit;cursor:pointer}
+.btn{width:100%;margin-top:14px;background:var(--altin);color:#1a1200;border:0;border-radius:10px;padding:13px;font-size:16px;font-weight:700}
+.btn:disabled{opacity:.45}
+.btn.ikincil{background:var(--kart2);color:var(--yazi);border:1px solid var(--cizgi);font-weight:600}
+.btn.sil{background:#5a1f1f;color:#ffd6d2;border:1px solid #8a3434}
+.satir{display:flex;gap:10px}.satir>*{flex:1;min-width:0}
+.skor{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin-top:8px}
+.skor .ad{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skor input{text-align:center;font-size:22px;font-weight:700;padding:8px}
+.not{margin-top:10px;padding:10px 12px;border-radius:9px;background:#2a2410;border:1px solid #6b5a1f;color:#f3dc9a;font-size:14px}
+.sekmeler{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:#0e1d30;border-top:1px solid var(--cizgi);padding-bottom:env(safe-area-inset-bottom)}
+.sekmeler button{flex:1;background:none;border:0;color:var(--soluk);padding:10px 4px 12px;font-size:13px;font-weight:600}
+.sekmeler button span{display:block;font-size:20px;line-height:1.2}
+.sekmeler button.on{color:var(--altin)}
+.liste .mac{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #1d3550}
+.liste .mac:last-child{border-bottom:0}
+.mac .tr{color:var(--soluk);font-size:13px;width:46px;flex:none}
+.mac .ic{flex:1;min-width:0;font-size:15px}
+.mac .ic b{font-variant-numeric:tabular-nums}
+.k{color:var(--yesil)}.m{color:var(--kirmizi)}.b{color:var(--mavi)}
+.mini{background:var(--kart2);border:1px solid var(--cizgi);color:var(--yazi);border-radius:8px;padding:7px 10px;font-size:14px;flex:none}
+.mini.sil{color:#ffb4ad}
+.oyuncu{display:grid;grid-template-columns:26px 1fr 64px auto;gap:6px;align-items:center;padding:6px 0;border-bottom:1px solid #1d3550}
+.oyuncu:last-child{border-bottom:0}
+.oyuncu .no{color:var(--altin);font-weight:700;text-align:right}
+.oyuncu input{padding:8px 9px;font-size:15px}
+.oyuncu input.hnd{text-align:center}
+.oyuncu .mini:disabled{opacity:.35}
+.oyuncu.degisti input{border-color:var(--altin)}
+.bos{color:var(--soluk);text-align:center;padding:14px 0}
+#tost{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:92%;background:#0f3a24;border:1px solid #2c7a4c;color:#d4f7e2;padding:10px 14px;border-radius:10px;font-size:15px;z-index:20;display:none;text-align:center}
+#tost.hata{background:#3a1414;border-color:#8a3434;color:#ffd6d2}
+#giris{max-width:420px;margin:40px auto;padding:0 14px}
+#giris .logo{text-align:center;margin-bottom:16px}#giris .logo img{height:84px;border-radius:12px}
+.bag{display:block;text-align:center;color:var(--soluk);margin-top:14px;font-size:14px;background:none;border:0;width:100%;text-decoration:underline}
+.gizli{display:none!important}
+dialog{background:var(--kart);color:var(--yazi);border:1px solid var(--cizgi);border-radius:12px;max-width:360px;width:90%}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog p{margin:4px 0 0;line-height:1.45}
+</style>
+</head>
+<body>
+<div id="giris">
+  <div class="logo"><img src="logo.png" alt=""><h2 style="margin-top:10px">Bilardomax Ligi · Yönetim</h2></div>
+  <div class="kart" id="girisKart">
+    <label for="gSifre">Şifre</label>
+    <input id="gSifre" type="password" autocomplete="current-password">
+    <button class="btn" id="gBtn">Giriş</button>
+    <button class="bag" id="kurulumAc">İlk kurulum (şifre belirle)</button>
+  </div>
+  <div class="kart gizli" id="kurulumKart">
+    <h2>İlk kurulum</h2>
+    <label for="kKod">Kurulum kodu</label><input id="kKod" inputmode="numeric" autocomplete="one-time-code">
+    <label for="kSifre">Yeni şifre (en az 6 karakter)</label><input id="kSifre" type="password" autocomplete="new-password">
+    <label for="kSifre2">Yeni şifre (tekrar)</label><input id="kSifre2" type="password" autocomplete="new-password">
+    <button class="btn" id="kBtn">Şifreyi kaydet ve gir</button>
+    <button class="bag" id="girisAc">Girişe dön</button>
+  </div>
+</div>
+
+<div id="uyg" class="gizli">
+  <header><img src="logo.png" alt=""><div class="bas"><b>Bilardomax Yönetim</b><small id="guncel"></small></div><button id="yenileBtn" title="Yenile">↻</button></header>
+  <main>
+    <!-- SKOR GİR -->
+    <section id="s-skor">
+      <div class="kart">
+        <h2>Skor gir</h2>
+        <label for="sGrup">Grup</label><select id="sGrup"></select>
+        <label for="sO1">1. oyuncu</label><select id="sO1"></select>
+        <label for="sO2">2. oyuncu</label><select id="sO2"></select>
+        <div id="sMevcut" class="not gizli"></div>
+        <div id="sSkorlar" class="gizli">
+          <label>Skor</label>
+          <div class="skor"><div class="ad" id="sAd1"></div><input id="sS1" type="number" inputmode="numeric" min="0" max="999"></div>
+          <div class="skor"><div class="ad" id="sAd2"></div><input id="sS2" type="number" inputmode="numeric" min="0" max="999"></div>
+          <label for="sTarih">Tarih</label><input id="sTarih" type="date">
+          <button class="btn" id="sKaydet">Kaydet</button>
+          <button class="btn sil gizli" id="sSil">Bu maçı sil</button>
+        </div>
+      </div>
+    </section>
+    <!-- MAÇLAR -->
+    <section id="s-mac" class="gizli">
+      <div class="kart">
+        <h2>Maçlar</h2>
+        <label for="mGrup">Grup</label><select id="mGrup"></select>
+        <div class="liste" id="mListe" style="margin-top:8px"></div>
+      </div>
+    </section>
+    <!-- OYUNCULAR -->
+    <section id="s-oyuncu" class="gizli">
+      <div class="kart">
+        <h2>Oyuncular</h2>
+        <label for="oGrup">Grup</label><select id="oGrup"></select>
+        <div style="color:var(--soluk);font-size:13px;margin:10px 0 4px">Adı ya da handikabı değiştirip satırdaki Kaydet'e basın. Ad değişince oyuncunun maçları yeni ada aktarılır.</div>
+        <div id="oListe"></div>
+      </div>
+    </section>
+    <!-- AYARLAR -->
+    <section id="s-ayar" class="gizli">
+      <div class="kart">
+        <h2>Şifre değiştir</h2>
+        <label for="aEski">Mevcut şifre</label><input id="aEski" type="password" autocomplete="current-password">
+        <label for="aYeni">Yeni şifre (en az 6 karakter)</label><input id="aYeni" type="password" autocomplete="new-password">
+        <label for="aYeni2">Yeni şifre (tekrar)</label><input id="aYeni2" type="password" autocomplete="new-password">
+        <button class="btn" id="aBtn">Şifreyi değiştir</button>
+      </div>
+      <div class="kart">
+        <h2>Bağlantılar</h2>
+        <a class="btn ikincil" style="display:block;text-align:center;text-decoration:none" href="./" target="_blank">Siteyi aç</a>
+        <a class="btn ikincil" style="display:block;text-align:center;text-decoration:none" href="tv.html" target="_blank">TV görünümünü aç</a>
+        <button class="btn sil" id="cikisBtn">Çıkış yap</button>
+      </div>
+    </section>
+  </main>
+  <nav class="sekmeler">
+    <button data-s="skor" class="on"><span>✎</span>Skor gir</button>
+    <button data-s="mac"><span>☰</span>Maçlar</button>
+    <button data-s="oyuncu"><span>👤</span>Oyuncular</button>
+    <button data-s="ayar"><span>⚙</span>Ayarlar</button>
+  </nav>
+</div>
+
+<dialog id="onay"><p id="onayMetin"></p><div class="satir" style="margin-top:6px"><button class="btn ikincil" id="onayHayir">Vazgeç</button><button class="btn" id="onayEvet">Evet</button></div></dialog>
+<div id="tost"></div>
+
+<script>
+const ADRES = 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const sinif = (a, b) => a > b ? 'k' : a < b ? 'm' : 'b';
+let token = '', ana = null, mesgul = false;
+try { token = localStorage.getItem('bm_yonetim') || ''; } catch (e) {}
+
+async function istek(o) {
+  const r = await fetch(ADRES, { method: 'POST', body: JSON.stringify(o) });
+  return r.json();
+}
+async function islem(o, mesajVar) {
+  if (mesgul) return null; mesgul = true;
+  document.querySelectorAll('.btn').forEach(b => b.disabled = true);
+  try {
+    const c = await istek(Object.assign({ token }, o));
+    if (c.oturum === false) { cikis(true); tost(c.hata, true); return null; }
+    if (!c.tamam) { tost(c.hata || 'Hata', true); return null; }
+    if (c.ana) { ana = c.ana; ciz(); }
+    if (c.mesaj && mesajVar !== false) tost(c.mesaj);
+    return c;
+  } catch (e) { tost('Bağlantı hatası, tekrar deneyin', true); return null; }
+  finally { mesgul = false; document.querySelectorAll('.btn').forEach(b => b.disabled = false); oyuncuDugmeleri(); }
+}
+let tostZaman;
+function tost(m, hata) { const t = $('tost'); t.textContent = m; t.className = hata ? 'hata' : ''; t.style.display = 'block'; clearTimeout(tostZaman); tostZaman = setTimeout(() => t.style.display = 'none', hata ? 5000 : 3000); }
+function onayla(metin) { return new Promise(coz => { $('onayMetin').textContent = metin; const d = $('onay'); d.showModal(); $('onayEvet').onclick = () => { d.close(); coz(true); }; $('onayHayir').onclick = () => { d.close(); coz(false); }; }); }
+
+// ---- giriş / kurulum ----
+$('kurulumAc').onclick = () => { $('girisKart').classList.add('gizli'); $('kurulumKart').classList.remove('gizli'); };
+$('girisAc').onclick = () => { $('kurulumKart').classList.add('gizli'); $('girisKart').classList.remove('gizli'); };
+$('gSifre').onkeydown = e => { if (e.key === 'Enter') $('gBtn').click(); };
+$('gBtn').onclick = async () => {
+  const c = await istek({ islem: 'giris', sifre: $('gSifre').value }).catch(() => null);
+  if (!c) return tost('Bağlantı hatası', true);
+  if (!c.tamam) { if (c.kurulum) $('kurulumAc').click(); return tost(c.hata, true); }
+  girisYap(c.token);
+};
+$('kBtn').onclick = async () => {
+  if ($('kSifre').value !== $('kSifre2').value) return tost('Şifreler aynı değil', true);
+  const c = await istek({ islem: 'kurulum', kod: $('kKod').value, sifre: $('kSifre').value }).catch(() => null);
+  if (!c) return tost('Bağlantı hatası', true);
+  if (!c.tamam) return tost(c.hata, true);
+  tost('Şifre kaydedildi'); girisYap(c.token);
+};
+async function girisYap(t) {
+  token = t; try { localStorage.setItem('bm_yonetim', t); } catch (e) {}
+  $('gSifre').value = ''; $('kSifre').value = ''; $('kSifre2').value = '';
+  const c = await islem({ islem: 'veri' });
+  if (c) { $('giris').classList.add('gizli'); $('uyg').classList.remove('gizli'); }
+}
+function cikis(sessiz) {
+  if (!sessiz && token) istek({ islem: 'cikis', token }).catch(() => {});
+  token = ''; ana = null; try { localStorage.removeItem('bm_yonetim'); } catch (e) {}
+  $('uyg').classList.add('gizli'); $('giris').classList.remove('gizli');
+}
+$('cikisBtn').onclick = () => cikis(false);
+$('yenileBtn').onclick = () => islem({ islem: 'veri' }).then(c => c && tost('Güncel'));
+
+// ---- sekmeler ----
+document.querySelectorAll('.sekmeler button').forEach(b => b.onclick = () => sekme(b.dataset.s));
+function sekme(s) {
+  document.querySelectorAll('.sekmeler button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
+  ['skor', 'mac', 'oyuncu', 'ayar'].forEach(k => $('s-' + k).classList.toggle('gizli', k !== s));
+  window.scrollTo(0, 0);
+}
+
+// ---- veri yardımcıları ----
+const grupOyunculari = g => ana.oyuncular.filter(o => o.grup === g).sort((x, y) => (y.hnd - x.hnd) || (x.no - y.no));
+const macBul = (g, a, b) => ana.maclar.find(m => m.g === g && ((m.a === a && m.b === b) || (m.a === b && m.b === a)));
+const bugun = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const tarihKisa = t => { const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[3]}.${m[2]}` : '—'; };
+const tarihUzun = t => { const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[3]}.${m[2]}.${m[1]}` : 'tarihsiz'; };
+
+function grupSecenekleri(sel) {
+  const v = sel.value || '1';
+  sel.innerHTML = Array.from({ length: 15 }, (_, i) => `<option value="${i + 1}">${i + 1}. Grup</option>`).join('');
+  sel.value = v;
+}
+
+function ciz() {
+  if (!ana) return;
+  $('guncel').textContent = 'Son güncelleme: ' + tarihUzun(ana.guncelleme) + ' ' + (String(ana.guncelleme || '').slice(11) || '');
+  ['sGrup', 'mGrup', 'oGrup'].forEach(id => { if (!$(id).options.length) grupSecenekleri($(id)); });
+  skorCiz(); macCiz(); oyuncuCiz();
+}
+
+// ---- skor gir ----
+function skorCiz() {
+  const g = +$('sGrup').value, ol = grupOyunculari(g);
+  const o1 = $('sO1').value, o2 = $('sO2').value;
+  $('sO1').innerHTML = '<option value="">Seçin…</option>' + ol.map(o => `<option value="${esc(o.ad)}">${esc(o.ad)} (${o.hnd})</option>`).join('');
+  $('sO1').value = ol.some(o => o.ad === o1) ? o1 : '';
+  const a = $('sO1').value;
+  $('sO2').innerHTML = '<option value="">Seçin…</option>' + ol.filter(o => o.ad !== a).map(o => {
+    const m = a && macBul(g, a, o.ad); let ek = '';
+    if (m) { const ks = m.a === a ? m.sa : m.sb, rs = m.a === a ? m.sb : m.sa; ek = ` — oynandı ${ks}-${rs}`; }
+    return `<option value="${esc(o.ad)}">${esc(o.ad)} (${o.hnd})${ek}</option>`;
+  }).join('');
+  $('sO2').disabled = !a;
+  $('sO2').value = a && ol.some(o => o.ad === o2 && o2 !== a) ? o2 : '';
+  skorFormu();
+}
+function skorFormu() {
+  const g = +$('sGrup').value, a = $('sO1').value, b = $('sO2').value;
+  const hazir = a && b;
+  $('sSkorlar').classList.toggle('gizli', !hazir);
+  $('sMevcut').classList.add('gizli'); $('sSil').classList.add('gizli');
+  if (!hazir) return;
+  $('sAd1').textContent = a; $('sAd2').textContent = b;
+  const m = macBul(g, a, b);
+  if (m) {
+    const ks = m.a === a ? m.sa : m.sb, rs = m.a === a ? m.sb : m.sa;
+    $('sMevcut').innerHTML = `Bu maç kayıtlı: <b>${esc(a)} ${ks}-${rs} ${esc(b)}</b> (${tarihUzun(m.t)}). Kaydederseniz güncellenir.`;
+    $('sMevcut').classList.remove('gizli'); $('sSil').classList.remove('gizli');
+    if (!$('sS1').dataset.elle) { $('sS1').value = ks; $('sS2').value = rs; $('sTarih').value = m.t || bugun(); }
+  } else if (!$('sS1').dataset.elle) { $('sS1').value = ''; $('sS2').value = ''; $('sTarih').value = bugun(); }
+}
+$('sGrup').onchange = () => { $('sO1').value = ''; $('sO2').value = ''; temizle(); skorCiz(); };
+$('sO1').onchange = () => { temizle(); skorCiz(); };
+$('sO2').onchange = () => { temizle(); skorFormu(); if ($('sO2').value) $('sS1').focus(); };
+['sS1', 'sS2'].forEach(id => $(id).addEventListener('input', () => $('sS1').dataset.elle = '1'));
+$('sS1').onkeydown = e => { if (e.key === 'Enter') $('sS2').focus(); };
+$('sS2').onkeydown = e => { if (e.key === 'Enter') $('sKaydet').click(); };
+function temizle() { delete $('sS1').dataset.elle; }
+$('sKaydet').onclick = async () => {
+  const sa = $('sS1').value.trim(), sb = $('sS2').value.trim();
+  if (!/^\d{1,3}$/.test(sa) || !/^\d{1,3}$/.test(sb)) return tost('İki skoru da girin', true);
+  const c = await islem({ islem: 'macKaydet', g: +$('sGrup').value, a: $('sO1').value, b: $('sO2').value, sa: +sa, sb: +sb, t: $('sTarih').value });
+  if (c) { $('sO2').value = ''; temizle(); skorCiz(); }
+};
+$('sSil').onclick = async () => {
+  const a = $('sO1').value, b = $('sO2').value;
+  if (!await onayla(`${a} – ${b} maçı silinsin mi?`)) return;
+  const c = await islem({ islem: 'macSil', g: +$('sGrup').value, a, b });
+  if (c) { $('sO2').value = ''; temizle(); skorCiz(); }
+};
+
+// ---- maçlar ----
+function macCiz() {
+  const g = +$('mGrup').value;
+  const ms = ana.maclar.filter(m => m.g === g).slice().sort((x, y) => String(y.t || '').localeCompare(String(x.t || '')));
+  $('mListe').innerHTML = ms.length ? ms.map((m, i) => `<div class="mac"><span class="tr">${tarihKisa(m.t)}</span><div class="ic">${esc(m.a)} <b><span class="${sinif(m.sa, m.sb)}">${m.sa}</span>-<span class="${sinif(m.sb, m.sa)}">${m.sb}</span></b> ${esc(m.b)}</div><button class="mini" data-d="${i}">✎</button><button class="mini sil" data-s="${i}">🗑</button></div>`).join('')
+    : '<div class="bos">Bu grupta henüz maç yok</div>';
+  $('mListe').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const m = ms[+b.dataset.d]; duzenle(m); });
+  $('mListe').querySelectorAll('[data-s]').forEach(b => b.onclick = async () => {
+    const m = ms[+b.dataset.s];
+    if (await onayla(`${m.a} ${m.sa}-${m.sb} ${m.b} maçı silinsin mi?`)) islem({ islem: 'macSil', g: m.g, a: m.a, b: m.b });
+  });
+}
+$('mGrup').onchange = macCiz;
+function duzenle(m) {
+  $('sGrup').value = m.g; temizle(); skorCiz();
+  $('sO1').value = m.a; skorCiz(); $('sO2').value = m.b; skorFormu();
+  sekme('skor'); $('sS1').focus();
+}
+
+// ---- oyuncular ----
+function oyuncuCiz() {
+  const g = +$('oGrup').value, ol = grupOyunculari(g);
+  $('oListe').innerHTML = ol.map((o, i) => `<div class="oyuncu" data-no="${o.no}"><span class="no">${i + 1}</span><input class="ad" value="${esc(o.ad)}" data-e="${esc(o.ad)}" aria-label="Ad"><input class="hnd" type="number" inputmode="numeric" min="1" max="99" value="${o.hnd}" data-e="${o.hnd}" aria-label="Handikap"><button class="mini" disabled>Kaydet</button></div>`).join('');
+  $('oListe').querySelectorAll('.oyuncu').forEach(r => {
+    const ad = r.querySelector('.ad'), h = r.querySelector('.hnd'), btn = r.querySelector('button');
+    const kontrol = () => { const d = ad.value.trim() !== ad.dataset.e || h.value.trim() !== h.dataset.e; r.classList.toggle('degisti', d); btn.disabled = !d; };
+    ad.oninput = kontrol; h.oninput = kontrol;
+    btn.onclick = async () => {
+      const yeniAd = ad.value.replace(/\s+/g, ' ').trim(), yeniH = h.value.trim();
+      if (!yeniAd) return tost('Ad boş olamaz', true);
+      if (!/^\d{1,2}$/.test(yeniH) || +yeniH < 1) return tost('Handikap 1-99 arası olmalı', true);
+      if (yeniAd !== ad.dataset.e && !await onayla(`${ad.dataset.e} adı "${yeniAd}" olarak değişsin mi? Maçları yeni ada aktarılır.`)) return;
+      islem({ islem: 'oyuncuGuncelle', no: +r.dataset.no, ad: yeniAd, hnd: +yeniH });
+    };
+  });
+}
+function oyuncuDugmeleri() { document.querySelectorAll('.oyuncu').forEach(r => { const ad = r.querySelector('.ad'), h = r.querySelector('.hnd'); r.querySelector('button').disabled = !(ad.value.trim() !== ad.dataset.e || h.value.trim() !== h.dataset.e); }); }
+$('oGrup').onchange = oyuncuCiz;
+
+// ---- şifre ----
+$('aBtn').onclick = async () => {
+  if ($('aYeni').value !== $('aYeni2').value) return tost('Yeni şifreler aynı değil', true);
+  const c = await islem({ islem: 'sifreDegistir', eski: $('aEski').value, yeni: $('aYeni').value });
+  if (c && c.token) { token = c.token; try { localStorage.setItem('bm_yonetim', token); } catch (e) {} ['aEski', 'aYeni', 'aYeni2'].forEach(id => $(id).value = ''); }
+};
+
+// ---- açılış ----
+if (token) girisYap(token);
+</script>
+</body>
+</html>
