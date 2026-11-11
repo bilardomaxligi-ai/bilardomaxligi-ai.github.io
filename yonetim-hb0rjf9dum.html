@@ -56,6 +56,12 @@ button{font:inherit;cursor:pointer}
 .oyuncu .mini:disabled{opacity:.35}
 .oyuncu.degisti input{border-color:var(--altin)}
 .bos{color:var(--soluk);text-align:center;padding:14px 0}
+.secim{display:flex;justify-content:space-between;align-items:center;width:100%;background:var(--kart2);border:1px solid var(--cizgi);color:var(--yazi);border-radius:9px;padding:11px 12px;margin-top:6px;font-size:16px;text-align:left}
+.secim small{color:var(--soluk);font-size:13px;flex:none;margin-left:8px}
+.ozet{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;margin-top:10px}
+.ozet div{background:#0b1a2c;border:1px solid var(--cizgi);border-radius:9px;padding:8px 2px}
+.ozet b{display:block;font-size:22px}.ozet span{font-size:12px;color:var(--soluk)}
+.mac .tr.lac{color:#8fb8ff}
 #tost{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:92%;background:#0f3a24;border:1px solid #2c7a4c;color:#d4f7e2;padding:10px 14px;border-radius:10px;font-size:15px;z-index:20;display:none;text-align:center}
 #tost.hata{background:#3a1414;border-color:#8a3434;color:#ffd6d2}
 #giris{max-width:420px;margin:40px auto;padding:0 14px}
@@ -125,6 +131,15 @@ dialog p{margin:4px 0 0;line-height:1.45}
         <div id="oListe"></div>
       </div>
     </section>
+    <!-- OYUNCU ARA -->
+    <section id="s-ara" class="gizli">
+      <div class="kart">
+        <h2>Oyuncu ara</h2>
+        <input id="aAra" type="search" placeholder="Ad yazın (örn. serdar)" autocomplete="off">
+        <div id="aSonuc" style="margin-top:6px"></div>
+      </div>
+      <div id="aDetay"></div>
+    </section>
     <!-- AYARLAR -->
     <section id="s-ayar" class="gizli">
       <div class="kart">
@@ -145,6 +160,7 @@ dialog p{margin:4px 0 0;line-height:1.45}
   <nav class="sekmeler">
     <button data-s="skor" class="on"><span>✎</span>Skor gir</button>
     <button data-s="mac"><span>☰</span>Maçlar</button>
+    <button data-s="ara"><span>🔍</span>Ara</button>
     <button data-s="oyuncu"><span>👤</span>Oyuncular</button>
     <button data-s="ayar"><span>⚙</span>Ayarlar</button>
   </nav>
@@ -217,7 +233,7 @@ $('yenileBtn').onclick = () => islem({ islem: 'veri' }).then(c => c && tost('Gü
 document.querySelectorAll('.sekmeler button').forEach(b => b.onclick = () => sekme(b.dataset.s));
 function sekme(s) {
   document.querySelectorAll('.sekmeler button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
-  ['skor', 'mac', 'oyuncu', 'ayar'].forEach(k => $('s-' + k).classList.toggle('gizli', k !== s));
+  ['skor', 'mac', 'ara', 'oyuncu', 'ayar'].forEach(k => $('s-' + k).classList.toggle('gizli', k !== s));
   window.scrollTo(0, 0);
 }
 
@@ -238,7 +254,7 @@ function ciz() {
   if (!ana) return;
   $('guncel').textContent = 'Son güncelleme: ' + tarihUzun(ana.guncelleme) + ' ' + (String(ana.guncelleme || '').slice(11) || '');
   ['sGrup', 'mGrup', 'oGrup'].forEach(id => { if (!$(id).options.length) grupSecenekleri($(id)); });
-  skorCiz(); macCiz(); oyuncuCiz();
+  skorCiz(); macCiz(); oyuncuCiz(); araCiz();
 }
 
 // ---- skor gir ----
@@ -319,6 +335,34 @@ function duzenle(m) {
   $('sO1').value = m.a; skorCiz(); $('sO2').value = m.b; skorFormu();
   sekme('skor'); $('sS1').focus();
 }
+
+// ---- oyuncu ara ----
+const norm = s => String(s || '').toLocaleLowerCase('tr').replace(/[çğıöşüâî]/g, c => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', â: 'a', î: 'i' }[c])).replace(/\s+/g, ' ').trim();
+let araNo = null;
+function araCiz() {
+  if (!ana) return;
+  const q = norm($('aAra').value);
+  const bulunan = q ? ana.oyuncular.filter(o => norm(o.ad).includes(q)).sort((x, y) => x.ad.localeCompare(y.ad, 'tr')) : [];
+  const secili = ana.oyuncular.find(o => o.no === araNo);
+  const gizle = secili && bulunan.length === 1 && bulunan[0].no === araNo;
+  $('aSonuc').innerHTML = !q ? '' : !bulunan.length ? '<div class="bos">Oyuncu bulunamadı</div>'
+    : gizle ? '' : bulunan.slice(0, 12).map(o => `<button class="secim" data-no="${o.no}"><span>${esc(o.ad)}</span><small>${o.grup}. Grup · H ${o.hnd}</small></button>`).join('');
+  $('aSonuc').querySelectorAll('[data-no]').forEach(b => b.onclick = () => { araNo = +b.dataset.no; $('aAra').value = ana.oyuncular.find(o => o.no === araNo).ad; araCiz(); $('aAra').blur(); });
+  if (!secili) { $('aDetay').innerHTML = ''; return; }
+  const ad = secili.ad, g = secili.grup;
+  const ms = ana.maclar.filter(m => m.g === g && (m.a === ad || m.b === ad)).map(m => ({ m, rakip: m.a === ad ? m.b : m.a, ks: m.a === ad ? m.sa : m.sb, rs: m.a === ad ? m.sb : m.sa }))
+    .sort((x, y) => String(y.m.t || '').localeCompare(String(x.m.t || '')));
+  const G = ms.filter(x => x.ks > x.rs).length, B = ms.filter(x => x.ks === x.rs).length, M = ms.length - G - B;
+  const hnd = Object.fromEntries(ana.oyuncular.filter(o => o.grup === g).map(o => [o.ad, o.hnd]));
+  const kalan = grupOyunculari(g).filter(o => o.ad !== ad && !ms.some(x => x.rakip === o.ad));
+  $('aDetay').innerHTML = `<div class="kart"><h2>${esc(ad)}</h2><div style="color:var(--soluk)">${g}. Grup · Handikap ${secili.hnd}</div>
+    <div class="ozet"><div><b>${ms.length}</b><span>Oynadı</span></div><div><b class="k">${G}</b><span>Galibiyet</span></div><div><b class="b">${B}</b><span>Beraberlik</span></div><div><b class="m">${M}</b><span>Mağlubiyet</span></div></div></div>
+    <div class="kart"><h2>Oynadığı maçlar (${ms.length})</h2><div class="liste">${ms.length ? ms.map((x, i) => `<div class="mac"><span class="tr lac">${tarihKisa(x.m.t)}</span><div class="ic"><b class="${sinif(x.ks, x.rs)}">${x.ks}</b> - <b class="${sinif(x.rs, x.ks)}">${x.rs}</b> ${esc(x.rakip)} <span style="color:var(--soluk)">(${hnd[x.rakip] ?? ''})</span></div><button class="mini" data-d="${i}">✎</button></div>`).join('') : '<div class="bos">Henüz maç yok</div>'}</div></div>
+    <div class="kart"><h2>Kalan maçlar (${kalan.length})</h2><div class="liste">${kalan.length ? kalan.map((o, i) => `<div class="mac"><div class="ic">${esc(o.ad)} <span style="color:var(--soluk)">(${o.hnd})</span></div><button class="mini" data-y="${i}">Skor gir</button></div>`).join('') : '<div class="bos">Tüm maçlarını oynadı</div>'}</div></div>`;
+  $('aDetay').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const x = ms[+b.dataset.d]; duzenle({ g, a: ad, b: x.rakip }); });
+  $('aDetay').querySelectorAll('[data-y]').forEach(b => b.onclick = () => duzenle({ g, a: ad, b: kalan[+b.dataset.y].ad }));
+}
+$('aAra').oninput = () => { araNo = null; araCiz(); };
 
 // ---- oyuncular ----
 function oyuncuCiz() {
