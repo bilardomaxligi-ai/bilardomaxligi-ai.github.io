@@ -357,11 +357,17 @@ function araCiz() {
   const kalan = grupOyunculari(g).filter(o => o.ad !== ad && !ms.some(x => x.rakip === o.ad));
   $('aDetay').innerHTML = `<div class="kart"><h2>${esc(ad)}</h2><div style="color:var(--soluk)">${g}. Grup</div>
     <label for="aHnd">Handikap</label><div class="satir" style="align-items:center"><input id="aHnd" type="number" inputmode="numeric" min="1" max="99" value="${secili.hnd}" style="text-align:center;font-size:20px;font-weight:700;max-width:110px"><button class="btn" id="aHndKaydet" style="margin-top:0" disabled>Handikabı kaydet</button></div>
+    <button class="btn turuncu" id="aSkorGit">✎ Maç sonucu gir (${g}. Gruba git)</button>
     <div class="ozet"><div><b>${ms.length}</b><span>Oynadı</span></div><div><b class="k">${G}</b><span>Galibiyet</span></div><div><b class="b">${B}</b><span>Beraberlik</span></div><div><b class="m">${M}</b><span>Mağlubiyet</span></div></div></div>
     <div class="kart"><h2>Oynadığı maçlar (${ms.length})</h2><div class="liste">${ms.length ? ms.map((x, i) => `<div class="mac"><span class="tr lac">${tarihKisa(x.m.t)}</span><div class="ic"><b class="${sinif(x.ks, x.rs)}">${x.ks}</b> - <b class="${sinif(x.rs, x.ks)}">${x.rs}</b> ${esc(x.rakip)} <span style="color:var(--soluk)">(${hnd[x.rakip] ?? ''})</span></div><button class="mini" data-d="${i}">✎</button></div>`).join('') : '<div class="bos">Henüz maç yok</div>'}</div></div>
     <div class="kart"><h2>Kalan maçlar (${kalan.length})</h2><div class="liste">${kalan.length ? kalan.map((o, i) => `<div class="mac"><div class="ic">${esc(o.ad)} <span style="color:var(--soluk)">(${o.hnd})</span></div><button class="mini" data-y="${i}">Skor gir</button></div>`).join('') : '<div class="bos">Tüm maçlarını oynadı</div>'}</div></div>`;
   $('aDetay').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const x = ms[+b.dataset.d]; duzenle({ g, a: ad, b: x.rakip }); });
   $('aDetay').querySelectorAll('[data-y]').forEach(b => b.onclick = () => duzenle({ g, a: ad, b: kalan[+b.dataset.y].ad }));
+  $('aSkorGit').onclick = () => {
+    $('sGrup').value = g; temizle(); $('sO2').value = ''; skorCiz();
+    $('sO1').value = ad; skorCiz(); sekme('skor');
+    tost(`${g}. Grup açıldı · ${ad} seçili. Rakibini seçin.`);
+  };
   const hIn = $('aHnd'), hBtn = $('aHndKaydet');
   hIn.oninput = () => { hBtn.disabled = hIn.value.trim() === String(secili.hnd); };
   hIn.onkeydown = e => { if (e.key === 'Enter' && !hBtn.disabled) hBtn.click(); };
