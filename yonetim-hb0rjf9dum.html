@@ -355,12 +355,22 @@ function araCiz() {
   const G = ms.filter(x => x.ks > x.rs).length, B = ms.filter(x => x.ks === x.rs).length, M = ms.length - G - B;
   const hnd = Object.fromEntries(ana.oyuncular.filter(o => o.grup === g).map(o => [o.ad, o.hnd]));
   const kalan = grupOyunculari(g).filter(o => o.ad !== ad && !ms.some(x => x.rakip === o.ad));
-  $('aDetay').innerHTML = `<div class="kart"><h2>${esc(ad)}</h2><div style="color:var(--soluk)">${g}. Grup · Handikap ${secili.hnd}</div>
+  $('aDetay').innerHTML = `<div class="kart"><h2>${esc(ad)}</h2><div style="color:var(--soluk)">${g}. Grup</div>
+    <label for="aHnd">Handikap</label><div class="satir" style="align-items:center"><input id="aHnd" type="number" inputmode="numeric" min="1" max="99" value="${secili.hnd}" style="text-align:center;font-size:20px;font-weight:700;max-width:110px"><button class="btn" id="aHndKaydet" style="margin-top:0" disabled>Handikabı kaydet</button></div>
     <div class="ozet"><div><b>${ms.length}</b><span>Oynadı</span></div><div><b class="k">${G}</b><span>Galibiyet</span></div><div><b class="b">${B}</b><span>Beraberlik</span></div><div><b class="m">${M}</b><span>Mağlubiyet</span></div></div></div>
     <div class="kart"><h2>Oynadığı maçlar (${ms.length})</h2><div class="liste">${ms.length ? ms.map((x, i) => `<div class="mac"><span class="tr lac">${tarihKisa(x.m.t)}</span><div class="ic"><b class="${sinif(x.ks, x.rs)}">${x.ks}</b> - <b class="${sinif(x.rs, x.ks)}">${x.rs}</b> ${esc(x.rakip)} <span style="color:var(--soluk)">(${hnd[x.rakip] ?? ''})</span></div><button class="mini" data-d="${i}">✎</button></div>`).join('') : '<div class="bos">Henüz maç yok</div>'}</div></div>
     <div class="kart"><h2>Kalan maçlar (${kalan.length})</h2><div class="liste">${kalan.length ? kalan.map((o, i) => `<div class="mac"><div class="ic">${esc(o.ad)} <span style="color:var(--soluk)">(${o.hnd})</span></div><button class="mini" data-y="${i}">Skor gir</button></div>`).join('') : '<div class="bos">Tüm maçlarını oynadı</div>'}</div></div>`;
   $('aDetay').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const x = ms[+b.dataset.d]; duzenle({ g, a: ad, b: x.rakip }); });
   $('aDetay').querySelectorAll('[data-y]').forEach(b => b.onclick = () => duzenle({ g, a: ad, b: kalan[+b.dataset.y].ad }));
+  const hIn = $('aHnd'), hBtn = $('aHndKaydet');
+  hIn.oninput = () => { hBtn.disabled = hIn.value.trim() === String(secili.hnd); };
+  hIn.onkeydown = e => { if (e.key === 'Enter' && !hBtn.disabled) hBtn.click(); };
+  hBtn.onclick = async () => {
+    const yeni = hIn.value.trim();
+    if (!/^\d{1,2}$/.test(yeni) || +yeni < 1) return tost('Handikap 1-99 arası olmalı', true);
+    if (!await onayla(`${ad} handikabı ${secili.hnd} → ${yeni} olsun mu?`)) { hIn.value = secili.hnd; hBtn.disabled = true; return; }
+    islem({ islem: 'oyuncuGuncelle', no: secili.no, ad, hnd: +yeni });
+  };
 }
 $('aAra').oninput = () => { araNo = null; araCiz(); };
 
@@ -381,7 +391,7 @@ function oyuncuCiz() {
     };
   });
 }
-function oyuncuDugmeleri() { document.querySelectorAll('.oyuncu').forEach(r => { const ad = r.querySelector('.ad'), h = r.querySelector('.hnd'); r.querySelector('button').disabled = !(ad.value.trim() !== ad.dataset.e || h.value.trim() !== h.dataset.e); }); }
+function oyuncuDugmeleri() { if ($('aHnd')) $('aHnd').oninput();document.querySelectorAll('.oyuncu').forEach(r => { const ad = r.querySelector('.ad'), h = r.querySelector('.hnd'); r.querySelector('button').disabled = !(ad.value.trim() !== ad.dataset.e || h.value.trim() !== h.dataset.e); }); }
 $('oGrup').onchange = oyuncuCiz;
 
 // ---- şifre ----
