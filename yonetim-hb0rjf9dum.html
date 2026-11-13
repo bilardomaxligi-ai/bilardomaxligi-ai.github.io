@@ -119,7 +119,13 @@ dialog p{margin:4px 0 0;line-height:1.45}
     <section id="s-mac" class="gizli">
       <div class="kart">
         <h2>Maçlar</h2>
-        <label for="mGrup">Grup</label><select id="mGrup"></select>
+        <label for="mGrup">Göster</label><select id="mGrup"></select>
+        <div id="mGunKutu" class="gizli">
+          <label for="mGun">Gün</label>
+          <div class="satir" style="align-items:center"><button class="mini" id="mOnceki" style="flex:none">◀</button><input id="mGun" type="date"><button class="mini" id="mSonraki" style="flex:none">▶</button></div>
+          <div id="mGunBas" style="margin-top:10px;font-weight:700;color:var(--altin)"></div>
+          <button class="btn ikincil" id="mToplu">Bu günün tüm maçlarının tarihini değiştir</button>
+        </div>
         <div class="liste" id="mListe" style="margin-top:8px"></div>
       </div>
     </section>
@@ -256,6 +262,7 @@ function ciz() {
   if (!ana) return;
   $('guncel').textContent = 'Son güncelleme: ' + tarihUzun(ana.guncelleme) + ' ' + (String(ana.guncelleme || '').slice(11) || '');
   ['sGrup', 'mGrup', 'oGrup'].forEach(id => { if (!$(id).options.length) grupSecenekleri($(id)); });
+  if (!$('mGrup').querySelector('[value=son]')) { $('mGrup').insertAdjacentHTML('afterbegin', '<option value="son">📅 Gün gün (tüm gruplar)</option>'); $('mGrup').value = 'son'; }
   skorCiz(); macCiz(); oyuncuCiz(); araCiz();
 }
 
@@ -320,11 +327,27 @@ $('sSil').onclick = async () => {
 };
 
 // ---- maçlar ----
+const gunler = () => [...new Set(ana.maclar.map(m => m.t).filter(Boolean))].sort();
 function macCiz() {
-  const g = +$('mGrup').value;
-  const ms = ana.maclar.filter(m => m.g === g).slice().sort((x, y) => String(y.t || '').localeCompare(String(x.t || '')));
-  $('mListe').innerHTML = ms.length ? ms.map((m, i) => `<div class="mac"><button class="tr" data-t="${i}" title="Tarihi değiştir">${tarihKisa(m.t)}</button><div class="ic">${esc(m.a)} <b><span class="${sinif(m.sa, m.sb)}">${m.sa}</span>-<span class="${sinif(m.sb, m.sa)}">${m.sb}</span></b> ${esc(m.b)}</div><button class="mini" data-d="${i}">✎</button><button class="mini sil" data-s="${i}">🗑</button></div>`).join('')
-    : '<div class="bos">Bu grupta henüz maç yok</div>';
+  const son = $('mGrup').value === 'son';
+  $('mGunKutu').classList.toggle('gizli', !son);
+  let ms;
+  if (son) {
+    const gl = gunler();
+    if (!$('mGun').value || !gl.includes($('mGun').value) && !$('mGun').dataset.elle) $('mGun').value = gl[gl.length - 1] || bugun();
+    const gun = $('mGun').value, i = gl.indexOf(gun);
+    $('mOnceki').disabled = !(i > 0 || (i < 0 && gl.some(x => x < gun)));
+    $('mSonraki').disabled = !(i >= 0 ? i < gl.length - 1 : gl.some(x => x > gun));
+    ms = ana.maclar.filter(m => m.t === gun).slice().sort((x, y) => (x.g - y.g) || x.a.localeCompare(y.a, 'tr'));
+    $('mGunBas').textContent = `${tarihUzun(gun)} · ${ms.length} maç`;
+    $('mToplu').disabled = !ms.length;
+    $('mToplu').onclick = () => topluTarih(ms, gun);
+  } else {
+    const g = +$('mGrup').value;
+    ms = ana.maclar.filter(m => m.g === g).slice().sort((x, y) => String(y.t || '').localeCompare(String(x.t || '')));
+  }
+  $('mListe').innerHTML = ms.length ? ms.map((m, i) => `<div class="mac"><button class="tr" data-t="${i}" title="Tarihi değiştir">${tarihKisa(m.t)}</button><div class="ic">${son ? `<small style="color:var(--soluk)">${m.g}. Grup</small><br>` : ''}${esc(m.a)} <b><span class="${sinif(m.sa, m.sb)}">${m.sa}</span>-<span class="${sinif(m.sb, m.sa)}">${m.sb}</span></b> ${esc(m.b)}</div><button class="mini" data-d="${i}">✎</button><button class="mini sil" data-s="${i}">🗑</button></div>`).join('')
+    : `<div class="bos">${son ? 'Bu günde maç yok' : 'Bu grupta henüz maç yok'}</div>`;
   $('mListe').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const m = ms[+b.dataset.d]; duzenle(m); });
   $('mListe').querySelectorAll('[data-t]').forEach(b => b.onclick = () => tarihDegistir(ms[+b.dataset.t]));
   $('mListe').querySelectorAll('[data-s]').forEach(b => b.onclick = async () => {
@@ -333,20 +356,50 @@ function macCiz() {
   });
 }
 $('mGrup').onchange = macCiz;
-function tarihDegistir(m) {
-  const d = $('tarihDlg');
-  $('tarihMac').textContent = `${m.a} ${m.sa}-${m.sb} ${m.b} · şu an: ${tarihUzun(m.t)}`;
-  $('tarihYeni').value = m.t || bugun();
-  d.showModal();
-  $('tarihHayir').onclick = () => d.close();
-  $('tarihEvet').onclick = async () => {
-    const t = $('tarihYeni').value;
-    if (!/^\d{4}-\d\d-\d\d$/.test(t)) return tost('Tarih seçin', true);
-    d.close();
-    if (t === (m.t || '')) return tost('Tarih aynı, değişiklik yok');
+$('mGun').onchange = () => { $('mGun').dataset.elle = '1'; macCiz(); };
+function gunKaydir(yon) {
+  const gl = gunler(), gun = $('mGun').value;
+  const hedef = yon < 0 ? gl.filter(x => x < gun).pop() : gl.find(x => x > gun);
+  if (hedef) { $('mGun').value = hedef; delete $('mGun').dataset.elle; macCiz(); }
+}
+$('mOnceki').onclick = () => gunKaydir(-1);
+$('mSonraki').onclick = () => gunKaydir(1);
+function tarihSor(metin, mevcut) {
+  return new Promise(coz => {
+    const d = $('tarihDlg');
+    $('tarihMac').textContent = metin;
+    $('tarihYeni').value = mevcut || bugun();
+    d.showModal();
+    $('tarihHayir').onclick = () => { d.close(); coz(null); };
+    $('tarihEvet').onclick = () => {
+      const t = $('tarihYeni').value;
+      if (!/^\d{4}-\d\d-\d\d$/.test(t)) return tost('Tarih seçin', true);
+      d.close(); coz(t);
+    };
+  });
+}
+async function tarihDegistir(m) {
+  const t = await tarihSor(`${m.a} ${m.sa}-${m.sb} ${m.b} · şu an: ${tarihUzun(m.t)}`, m.t);
+  if (!t) return;
+  if (t === (m.t || '')) return tost('Tarih aynı, değişiklik yok');
+  const c = await islem({ islem: 'macKaydet', g: m.g, a: m.a, b: m.b, sa: m.sa, sb: m.sb, t }, false);
+  if (c) tost('Tarih değişti: ' + tarihUzun(t));
+}
+async function topluTarih(ms, gun) {
+  if (!ms.length) return tost('Bu günde maç yok', true);
+  const t = await tarihSor(`${tarihUzun(gun)} günündeki ${ms.length} maçın hepsi yeni tarihe taşınsın:`, gun);
+  if (!t) return;
+  if (t === gun) return tost('Tarih aynı, değişiklik yok');
+  if (!await onayla(`${ms.length} maçın tarihi ${tarihUzun(gun)} → ${tarihUzun(t)} olacak. Emin misiniz?`)) return;
+  const liste = ms.slice(); let n = 0;
+  for (const m of liste) {
+    $('mGunBas').textContent = `Kaydediliyor… ${n + 1}/${liste.length}`;
     const c = await islem({ islem: 'macKaydet', g: m.g, a: m.a, b: m.b, sa: m.sa, sb: m.sb, t }, false);
-    if (c) tost('Tarih değişti: ' + tarihUzun(t));
-  };
+    if (!c) break;
+    n++;
+  }
+  $('mGun').value = t; delete $('mGun').dataset.elle; macCiz();
+  tost(n === liste.length ? `${n} maçın tarihi ${tarihUzun(t)} oldu` : `${n}/${liste.length} maç taşındı, kalanlar için tekrar deneyin`, n !== liste.length);
 }
 function duzenle(m) {
   $('sGrup').value = m.g; temizle(); skorCiz();
