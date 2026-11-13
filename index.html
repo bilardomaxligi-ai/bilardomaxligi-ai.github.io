@@ -22,6 +22,8 @@ if (!/SamsungBrowser/i.test(navigator.userAgent)) { var lm = document.createElem
 </script>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&text=Ali%20Kaz%C4%B1rlar&display=swap">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -134,7 +136,7 @@ td.p{font-weight:700;color:var(--gold)}
 .kur{display:none;background:var(--panel2);border:1px solid var(--gold);border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:14px}
 .kur b{color:var(--gold)}
 .imza{text-align:center;color:var(--muted);font-size:12px;letter-spacing:.3px;margin:22px 0 4px;opacity:.85}
-.imza b{color:var(--gold);font-weight:600}
+.imza b,.acilis .a-imza b{color:var(--gold);font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:1.3em;letter-spacing:2px;margin-left:3px;white-space:nowrap}
 /* Sponsor: başlıkta küçük satır, sayfa sonunda kart, açılışta kısa ekran */
 .sponsor{display:flex;align-items:center;gap:6px;margin:1px 0 1px;font-size:12.5px;color:var(--muted);font-style:italic;letter-spacing:.2px}
 .sponsor img{height:17px;width:auto;display:block}
@@ -152,7 +154,6 @@ td.p{font-weight:700;color:var(--gold)}
 .acilis .a-yuk i:nth-child(2){animation-delay:.2s} .acilis .a-yuk i:nth-child(3){animation-delay:.4s}
 .acilis .a-yz{font-size:12px;color:var(--muted);letter-spacing:.4px;margin-top:2px}
 .acilis .a-imza{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 22px);text-align:center;font-size:13px;color:var(--muted);letter-spacing:.3px}
-.acilis .a-imza b{color:var(--gold);font-weight:600}
 @keyframes nokta{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-7px)}}
 @keyframes spGel{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .kur button{float:right;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
