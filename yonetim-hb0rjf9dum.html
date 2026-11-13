@@ -62,6 +62,7 @@ button{font:inherit;cursor:pointer}
 .ozet div{background:#0b1a2c;border:1px solid var(--cizgi);border-radius:9px;padding:8px 2px}
 .ozet b{display:block;font-size:22px}.ozet span{font-size:12px;color:var(--soluk)}
 .mac .tr.lac{color:#8fb8ff}
+button.tr{background:none;border:1px dashed var(--cizgi);border-radius:7px;padding:5px 2px;font:inherit;font-size:13px;color:#8fb8ff;width:52px}
 #tost{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:92%;background:#0f3a24;border:1px solid #2c7a4c;color:#d4f7e2;padding:10px 14px;border-radius:10px;font-size:15px;z-index:20;display:none;text-align:center}
 #tost.hata{background:#3a1414;border-color:#8a3434;color:#ffd6d2}
 #giris{max-width:420px;margin:40px auto;padding:0 14px}
@@ -167,6 +168,7 @@ dialog p{margin:4px 0 0;line-height:1.45}
 </div>
 
 <dialog id="onay"><p id="onayMetin"></p><div class="satir" style="margin-top:6px"><button class="btn ikincil" id="onayHayir">Vazgeç</button><button class="btn" id="onayEvet">Evet</button></div></dialog>
+<dialog id="tarihDlg"><b style="color:var(--altin)">Maç tarihini değiştir</b><p id="tarihMac"></p><input id="tarihYeni" type="date" style="margin-top:10px"><div class="satir" style="margin-top:6px"><button class="btn ikincil" id="tarihHayir">Vazgeç</button><button class="btn" id="tarihEvet">Kaydet</button></div></dialog>
 <div id="tost"></div>
 
 <script>
@@ -321,15 +323,31 @@ $('sSil').onclick = async () => {
 function macCiz() {
   const g = +$('mGrup').value;
   const ms = ana.maclar.filter(m => m.g === g).slice().sort((x, y) => String(y.t || '').localeCompare(String(x.t || '')));
-  $('mListe').innerHTML = ms.length ? ms.map((m, i) => `<div class="mac"><span class="tr">${tarihKisa(m.t)}</span><div class="ic">${esc(m.a)} <b><span class="${sinif(m.sa, m.sb)}">${m.sa}</span>-<span class="${sinif(m.sb, m.sa)}">${m.sb}</span></b> ${esc(m.b)}</div><button class="mini" data-d="${i}">✎</button><button class="mini sil" data-s="${i}">🗑</button></div>`).join('')
+  $('mListe').innerHTML = ms.length ? ms.map((m, i) => `<div class="mac"><button class="tr" data-t="${i}" title="Tarihi değiştir">${tarihKisa(m.t)}</button><div class="ic">${esc(m.a)} <b><span class="${sinif(m.sa, m.sb)}">${m.sa}</span>-<span class="${sinif(m.sb, m.sa)}">${m.sb}</span></b> ${esc(m.b)}</div><button class="mini" data-d="${i}">✎</button><button class="mini sil" data-s="${i}">🗑</button></div>`).join('')
     : '<div class="bos">Bu grupta henüz maç yok</div>';
   $('mListe').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const m = ms[+b.dataset.d]; duzenle(m); });
+  $('mListe').querySelectorAll('[data-t]').forEach(b => b.onclick = () => tarihDegistir(ms[+b.dataset.t]));
   $('mListe').querySelectorAll('[data-s]').forEach(b => b.onclick = async () => {
     const m = ms[+b.dataset.s];
     if (await onayla(`${m.a} ${m.sa}-${m.sb} ${m.b} maçı silinsin mi?`)) islem({ islem: 'macSil', g: m.g, a: m.a, b: m.b });
   });
 }
 $('mGrup').onchange = macCiz;
+function tarihDegistir(m) {
+  const d = $('tarihDlg');
+  $('tarihMac').textContent = `${m.a} ${m.sa}-${m.sb} ${m.b} · şu an: ${tarihUzun(m.t)}`;
+  $('tarihYeni').value = m.t || bugun();
+  d.showModal();
+  $('tarihHayir').onclick = () => d.close();
+  $('tarihEvet').onclick = async () => {
+    const t = $('tarihYeni').value;
+    if (!/^\d{4}-\d\d-\d\d$/.test(t)) return tost('Tarih seçin', true);
+    d.close();
+    if (t === (m.t || '')) return tost('Tarih aynı, değişiklik yok');
+    const c = await islem({ islem: 'macKaydet', g: m.g, a: m.a, b: m.b, sa: m.sa, sb: m.sb, t }, false);
+    if (c) tost('Tarih değişti: ' + tarihUzun(t));
+  };
+}
 function duzenle(m) {
   $('sGrup').value = m.g; temizle(); skorCiz();
   $('sO1').value = m.a; skorCiz(); $('sO2').value = m.b; skorFormu();
@@ -359,9 +377,10 @@ function araCiz() {
     <label for="aHnd">Handikap</label><div class="satir" style="align-items:center"><input id="aHnd" type="number" inputmode="numeric" min="1" max="99" value="${secili.hnd}" style="text-align:center;font-size:20px;font-weight:700;max-width:110px"><button class="btn" id="aHndKaydet" style="margin-top:0" disabled>Handikabı kaydet</button></div>
     <button class="btn turuncu" id="aSkorGit">✎ Maç sonucu gir (${g}. Gruba git)</button>
     <div class="ozet"><div><b>${ms.length}</b><span>Oynadı</span></div><div><b class="k">${G}</b><span>Galibiyet</span></div><div><b class="b">${B}</b><span>Beraberlik</span></div><div><b class="m">${M}</b><span>Mağlubiyet</span></div></div></div>
-    <div class="kart"><h2>Oynadığı maçlar (${ms.length})</h2><div class="liste">${ms.length ? ms.map((x, i) => `<div class="mac"><span class="tr lac">${tarihKisa(x.m.t)}</span><div class="ic"><b class="${sinif(x.ks, x.rs)}">${x.ks}</b> - <b class="${sinif(x.rs, x.ks)}">${x.rs}</b> ${esc(x.rakip)} <span style="color:var(--soluk)">(${hnd[x.rakip] ?? ''})</span></div><button class="mini" data-d="${i}">✎</button></div>`).join('') : '<div class="bos">Henüz maç yok</div>'}</div></div>
+    <div class="kart"><h2>Oynadığı maçlar (${ms.length})</h2><div class="liste">${ms.length ? ms.map((x, i) => `<div class="mac"><button class="tr" data-t="${i}" title="Tarihi değiştir">${tarihKisa(x.m.t)}</button><div class="ic"><b class="${sinif(x.ks, x.rs)}">${x.ks}</b> - <b class="${sinif(x.rs, x.ks)}">${x.rs}</b> ${esc(x.rakip)} <span style="color:var(--soluk)">(${hnd[x.rakip] ?? ''})</span></div><button class="mini" data-d="${i}">✎</button></div>`).join('') : '<div class="bos">Henüz maç yok</div>'}</div></div>
     <div class="kart"><h2>Kalan maçlar (${kalan.length})</h2><div class="liste">${kalan.length ? kalan.map((o, i) => `<div class="mac"><div class="ic">${esc(o.ad)} <span style="color:var(--soluk)">(${o.hnd})</span></div><button class="mini" data-y="${i}">Skor gir</button></div>`).join('') : '<div class="bos">Tüm maçlarını oynadı</div>'}</div></div>`;
   $('aDetay').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { const x = ms[+b.dataset.d]; duzenle({ g, a: ad, b: x.rakip }); });
+  $('aDetay').querySelectorAll('[data-t]').forEach(b => b.onclick = () => tarihDegistir(ms[+b.dataset.t].m));
   $('aDetay').querySelectorAll('[data-y]').forEach(b => b.onclick = () => duzenle({ g, a: ad, b: kalan[+b.dataset.y].ad }));
   $('aSkorGit').onclick = () => {
     $('sGrup').value = g; temizle(); $('sO2').value = ''; skorCiz();
