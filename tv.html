@@ -117,6 +117,7 @@ td.ust7{color:var(--altin)}
 .pgs .vs{text-align:center;color:var(--soluk);font-size:.7em}
 .pgs .vs.sk{color:var(--yazi);font-size:1em}
 .pgs .ms{text-align:right;padding-right:calc(var(--u)*.8);color:var(--soluk);font-size:.68em;font-weight:600}
+.bas .bt b .bgun{color:#7cc0ff;font-size:.62em;font-weight:700;margin-left:.5em;vertical-align:middle}
 .bosmesaj{height:100%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3);color:var(--soluk)}
 </style>
 </head>
@@ -245,9 +246,10 @@ function gunProgrami(gun) { return (V && V.program || []).filter(p => p[0] === g
 function programCiz(gun, sayfa, top) {
   const hepsi = gunProgrami(gun), ps = hepsi.slice(sayfa * PROG_SAYFA, (sayfa + 1) * PROG_SAYFA);
   const d = new Date(gun + 'T12:00'), gunAd = d.toLocaleDateString('tr-TR', { weekday: 'long' });
-  $('baslik').textContent = 'Gelecek Maçlar';
   const [y, a, g] = gun.split('-');
-  $('ek').textContent = (gun === gunEk(0) ? 'Bugün · ' : gun === gunEk(1) ? 'Yarın · ' : '') + `${gunAd.charAt(0).toLocaleUpperCase('tr') + gunAd.slice(1)} ${g}.${a}.${y}` + (top > 1 ? ` · ${sayfa + 1}/${top}` : '');
+  const etiket = (gun === gunEk(0) ? 'Bugün · ' : gun === gunEk(1) ? 'Yarın · ' : '') + `${gunAd.charAt(0).toLocaleUpperCase('tr') + gunAd.slice(1)} ${g}.${a}.${y}`;
+  $('baslik').innerHTML = `Gelecek Maçlar <span class="bgun">${esc(etiket)}</span>`;
+  $('ek').textContent = top > 1 ? `Sayfa ${sayfa + 1} / ${top}` : `${hepsi.length} maç`;
   if (!ps.length) { $('icerik').innerHTML = '<div class="bosmesaj">Programda maç yok</div>'; return; }
   const sut = ps.length > 10 ? 2 : 1, sat = Math.max(Math.ceil(ps.length / sut), 8);
   const mac = {}; for (const gr of V.gruplar) for (const [t, x, sx, z, sz] of gr.maclar) { mac[gr.no + '|' + x + '|' + z] = [sx, sz]; mac[gr.no + '|' + z + '|' + x] = [sz, sx]; }
