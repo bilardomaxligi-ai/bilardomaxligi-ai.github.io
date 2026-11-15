@@ -245,9 +245,9 @@ function gunProgrami(gun) { return (V && V.program || []).filter(p => p[0] === g
 function programCiz(gun, sayfa, top) {
   const hepsi = gunProgrami(gun), ps = hepsi.slice(sayfa * PROG_SAYFA, (sayfa + 1) * PROG_SAYFA);
   const d = new Date(gun + 'T12:00'), gunAd = d.toLocaleDateString('tr-TR', { weekday: 'long' });
-  $('baslik').textContent = gun === gunEk(0) ? 'Bugünün Maçları' : gun === gunEk(1) ? 'Yarının Maçları' : 'Maç Programı';
+  $('baslik').textContent = 'Gelecek Maçlar';
   const [y, a, g] = gun.split('-');
-  $('ek').textContent = `${gunAd.charAt(0).toLocaleUpperCase('tr') + gunAd.slice(1)} ${g}.${a}.${y}` + (top > 1 ? ` · ${sayfa + 1}/${top}` : '');
+  $('ek').textContent = (gun === gunEk(0) ? 'Bugün · ' : gun === gunEk(1) ? 'Yarın · ' : '') + `${gunAd.charAt(0).toLocaleUpperCase('tr') + gunAd.slice(1)} ${g}.${a}.${y}` + (top > 1 ? ` · ${sayfa + 1}/${top}` : '');
   if (!ps.length) { $('icerik').innerHTML = '<div class="bosmesaj">Programda maç yok</div>'; return; }
   const sut = ps.length > 10 ? 2 : 1, sat = Math.max(Math.ceil(ps.length / sut), 8);
   const mac = {}; for (const gr of V.gruplar) for (const [t, x, sx, z, sz] of gr.maclar) { mac[gr.no + '|' + x + '|' + z] = [sx, sz]; mac[gr.no + '|' + z + '|' + x] = [sz, sx]; }
