@@ -156,6 +156,20 @@ td.p{font-weight:700;color:var(--gold)}
 .acilis .a-imza{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 22px);text-align:center;font-size:13px;color:var(--muted);letter-spacing:.3px}
 @keyframes nokta{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-7px)}}
 @keyframes spGel{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* Maç programı */
+nav button.yeni::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:6px;vertical-align:middle}
+.pr{display:grid;grid-template-columns:50px minmax(0,1fr) auto minmax(0,1fr);gap:2px 8px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line)}
+.pr:last-child{border-bottom:0}
+.pr .sa{grid-row:1 / span 2;font-size:17px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.pr .o1{text-align:right;font-weight:600} .pr .o2{font-weight:600}
+@media (max-width:600px){.pr{grid-template-columns:44px minmax(0,1fr) auto minmax(0,1fr);gap:2px 6px} .pr .sa{font-size:15px} .pr .o1,.pr .o2{font-size:14px} .pr small{white-space:nowrap}}
+.pr small{color:var(--muted);font-weight:400}
+.pr .vs{color:var(--muted);font-size:13px;text-align:center;min-width:26px}
+.pr .vs.skor{color:var(--text);font-size:16px}
+.pr .alt{grid-column:2 / span 3;text-align:center;font-size:12px;color:var(--muted)}
+.pr [data-ad]{cursor:pointer}
+.yakin{background:rgba(224,176,74,.12);border:1px solid rgba(224,176,74,.5);border-radius:10px;padding:8px 12px;margin:0 0 10px;font-size:14px}
+.yakin b{color:var(--gold)}
 .kur button{float:right;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 @media (max-width:600px){
   .ust img{height:50px} .ust h1{font-size:18px}
@@ -198,6 +212,7 @@ td.p{font-weight:700;color:var(--gold)}
   <nav id="nav">
     <button data-s="oyuncu" class="on">Oyuncu ara</button>
     <button data-s="gruplar">Gruplar</button>
+    <button data-s="program" id="navProgram">Program</button>
     <button data-s="son">Son maçlar</button>
   </nav>
 </header>
@@ -227,6 +242,7 @@ td.p{font-weight:700;color:var(--gold)}
       <div id="grupIcerik"></div>
     </div>
   </section>
+  <section id="s-program" hidden><div class="kart"><h2>Maç programı</h2><div id="programIcerik"></div></div></section>
   <section id="s-son" hidden><div class="kart"><h2>Son 7 günün maçları</h2><div id="sonIcerik"></div></div></section>
   <div class="sp-kart"><div>Ligin sponsoru</div><img src="marmatek.png" alt="Marmatek"></div>
   <div class="imza">Created by <b>Ali Kazırlar</b></div>
@@ -303,13 +319,16 @@ function oyuncuCiz() {
     const c = r.m ? sonucSinif(r.m[0], r.m[1]) : 'o';
     return `<div class="mac"><div class="rk" data-ad="${esc(r.ad)}">${esc(r.ad)} <small>(${esc(r.hnd)})</small></div>
       <div class="sk">${r.m ? `<div class="skor">${esc(r.m[0])} - ${esc(r.m[1])}</div>` : ''}<span class="sonuc s-${c}">${SONUC_AD[c]}</span></div>
-      <div class="tr">${r.m ? tarihYaz(r.m[2]) : 'Maç kaldı'}</div></div>`;
+      <div class="tr">${r.m ? tarihYaz(r.m[2]) : r.p ? `<b style="color:var(--gold)">Programda: ${r.p[0] === gunEk(0) ? 'Bugün' : r.p[0] === gunEk(1) ? 'Yarın' : tarihYaz(r.p[0])}${r.p[1] ? ' ' + esc(r.p[1]) : ''}</b>` : 'Maç kaldı'}</div></div>`;
   };
+  const yp = oyuncuProgrami(o.ad);
+  for (const r of kalan) r.p = yp.find(p => p[3] === r.ad || p[5] === r.ad);
   el.innerHTML = `<div class="kart">
     <div class="oyuncu-bas"><span class="ad">${esc(o.ad)}</span>
       <span class="rozet">Handikap <b>${esc(o.hnd)}</b></span>
       <span class="rozet"><b>${o.grup}. Grup</b></span>
       ${s[0] != null ? `<span class="rozet">Sıra <b>${esc(s[0])}</b></span>` : ''}</div>
+    ${yp.map(p => { const rk = p[3] === o.ad ? p[5] : p[3]; return `<div class="yakin">📅 <b>${esc(gunBaslik(p[0]))}${p[1] ? ' · ' + esc(p[1]) : ''}</b><br>Rakip: ${esc(rk)}${p[7] ? ' · Masa ' + esc(p[7]) : ''}</div>`; }).join('')}
     <div class="sayilar">
       <div class="p"><b>${esc(s[7] ?? 0)}</b><span>Puan</span></div>
       <div class="k"><b>${esc(s[4] ?? 0)}</b><span>Galibiyet</span></div>
@@ -362,6 +381,34 @@ function macListesi(ms, grupGoster) {
   }
   return h;
 }
+// ---- maç programı ----
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function gunEk(n) { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); }
+function gunBaslik(t) {
+  const d = new Date(t + 'T12:00'), ad = isNaN(d) ? '' : d.toLocaleDateString('tr-TR', { weekday: 'long' });
+  return (t === gunEk(0) ? 'Bugün · ' : t === gunEk(1) ? 'Yarın · ' : '') + ad + ' ' + tarihYaz(t);
+}
+// Bugün ve sonrası: [t, saat, grup, a, hndA, b, hndB, masa]
+function gelecekProgram() { const b = gunEk(0); return (V && V.program || []).filter(p => p[0] >= b); }
+function programSkor(p) { const g = V.gruplar.find(x => x.no === p[2]); return g && g.mac[p[3] + '|' + p[5]]; }
+function programCiz() {
+  const ps = gelecekProgram();
+  if (!ps.length) { $('programIcerik').innerHTML = '<div class="bos">Şu an programda maç yok. Program girildiğinde burada görünür.</div>'; return; }
+  let son = null, h = '';
+  for (const p of ps) {
+    const [t, s, g, a, ha, b, hb, masa] = p;
+    if (t !== son) { h += `<div class="tarih-baslik">${esc(gunBaslik(t))}</div>`; son = t; }
+    const m = programSkor(p);
+    h += `<div class="pr"><div class="sa">${esc(s || '—')}</div>
+      <div class="o1" data-ad="${esc(a)}">${esc(a)} <small>(${esc(ha)})</small></div>
+      <div class="vs${m ? ' skor' : ''}">${m ? `<b>${esc(m[0])} - ${esc(m[1])}</b>` : 'vs'}</div>
+      <div class="o2" data-ad="${esc(b)}">${esc(b)} <small>(${esc(hb)})</small></div>
+      <div class="alt">${g}. Grup${masa ? ' · Masa ' + esc(masa) : ''}${m ? ' · Oynandı' : ''}</div></div>`;
+  }
+  $('programIcerik').innerHTML = h;
+}
+// Oyuncunun programdaki yaklaşan maçları
+function oyuncuProgrami(ad) { return gelecekProgram().filter(p => (p[3] === ad || p[5] === ad) && !programSkor(p)); }
 function sonCiz() {
   if (!V) return;
   // Son 7 gün: bugün ve önceki 6 gün
@@ -375,10 +422,10 @@ function sonCiz() {
 
 // ---- sekmeler ----
 function sekmeAc(s) {
-  if (!['oyuncu', 'gruplar', 'son'].includes(s)) s = 'oyuncu';
+  if (!['oyuncu', 'gruplar', 'program', 'son'].includes(s)) s = 'oyuncu';
   durum.sekme = s; kaydet();
   document.querySelectorAll('#nav button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
-  for (const id of ['oyuncu', 'gruplar', 'son']) $('s-' + id).hidden = id !== s;
+  for (const id of ['oyuncu', 'gruplar', 'program', 'son']) $('s-' + id).hidden = id !== s;
   ciz();
   window.scrollTo(0, 0);
 }
@@ -386,7 +433,9 @@ function ciz() {
   if (!V) return;
   if (durum.sekme === 'oyuncu') oyuncuCiz();
   else if (durum.sekme === 'gruplar') grupCiz();
+  else if (durum.sekme === 'program') programCiz();
   else sonCiz();
+  $('navProgram').classList.toggle('yeni', gelecekProgram().length > 0);
 }
 
 // ---- veri yükleme ----
@@ -476,7 +525,7 @@ if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.se
   let m;
   if (h.startsWith('o=')) { durum.oyuncu = h.slice(2); durum.sekme = 'oyuncu'; }
   else if ((m = h.match(/^g(\d+)(?:-(puan|matris|maclar))?$/))) { durum.grup = +m[1]; durum.grupSekme = m[2] || 'puan'; durum.sekme = 'gruplar'; }
-  else if (h === 'son') durum.sekme = h;
+  else if (h === 'son' || h === 'program') durum.sekme = h;
 })();
 // Açılış ekranı (sponsor): her ziyarette bir kez ~4 sn görünür, dokununca hemen kapanır
 (function () {
