@@ -173,7 +173,7 @@ nav button.yeni::after{content:"";display:inline-block;width:7px;height:7px;bord
 .kur button{float:right;background:none;border:0;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
 @media (max-width:600px){
   .ust img{height:50px} .ust h1{font-size:18px}
-  nav button{font-size:14px;padding:9px 8px}
+  nav{gap:0} nav button{font-size:13.5px;padding:9px 5px;letter-spacing:-.1px} nav button.yeni::after{width:6px;height:6px;margin-left:4px}
   th,td{padding:7px 4px}
   .gizle-k{display:none}
   .sekme2 button{font-size:13px;padding:10px 4px;white-space:nowrap}
@@ -212,7 +212,7 @@ nav button.yeni::after{content:"";display:inline-block;width:7px;height:7px;bord
   <nav id="nav">
     <button data-s="oyuncu" class="on">Oyuncu ara</button>
     <button data-s="gruplar">Gruplar</button>
-    <button data-s="program" id="navProgram">Program</button>
+    <button data-s="program" id="navProgram">Gelecek Maçlar</button>
     <button data-s="son">Son maçlar</button>
   </nav>
 </header>
@@ -242,7 +242,7 @@ nav button.yeni::after{content:"";display:inline-block;width:7px;height:7px;bord
       <div id="grupIcerik"></div>
     </div>
   </section>
-  <section id="s-program" hidden><div class="kart"><h2>Maç programı</h2><div id="programIcerik"></div></div></section>
+  <section id="s-program" hidden><div class="kart"><h2>Gelecek Maçlar</h2><div id="programIcerik"></div></div></section>
   <section id="s-son" hidden><div class="kart"><h2>Son 7 günün maçları</h2><div id="sonIcerik"></div></div></section>
   <div class="sp-kart"><div>Ligin sponsoru</div><img src="marmatek.png" alt="Marmatek"></div>
   <div class="imza">Created by <b>Ali Kazırlar</b></div>
@@ -319,7 +319,7 @@ function oyuncuCiz() {
     const c = r.m ? sonucSinif(r.m[0], r.m[1]) : 'o';
     return `<div class="mac"><div class="rk" data-ad="${esc(r.ad)}">${esc(r.ad)} <small>(${esc(r.hnd)})</small></div>
       <div class="sk">${r.m ? `<div class="skor">${esc(r.m[0])} - ${esc(r.m[1])}</div>` : ''}<span class="sonuc s-${c}">${SONUC_AD[c]}</span></div>
-      <div class="tr">${r.m ? tarihYaz(r.m[2]) : r.p ? `<b style="color:var(--gold)">Programda: ${r.p[0] === gunEk(0) ? 'Bugün' : r.p[0] === gunEk(1) ? 'Yarın' : tarihYaz(r.p[0])}${r.p[1] ? ' ' + esc(r.p[1]) : ''}</b>` : 'Maç kaldı'}</div></div>`;
+      <div class="tr">${r.m ? tarihYaz(r.m[2]) : r.p ? `<b style="color:var(--gold)">📅 ${r.p[0] === gunEk(0) ? 'Bugün' : r.p[0] === gunEk(1) ? 'Yarın' : tarihYaz(r.p[0])}${r.p[1] ? ' ' + esc(r.p[1]) : ''}</b>` : 'Maç kaldı'}</div></div>`;
   };
   const yp = oyuncuProgrami(o.ad);
   for (const r of kalan) r.p = yp.find(p => p[3] === r.ad || p[5] === r.ad);
@@ -393,7 +393,7 @@ function gelecekProgram() { const b = gunEk(0); return (V && V.program || []).fi
 function programSkor(p) { const g = V.gruplar.find(x => x.no === p[2]); return g && g.mac[p[3] + '|' + p[5]]; }
 function programCiz() {
   const ps = gelecekProgram();
-  if (!ps.length) { $('programIcerik').innerHTML = '<div class="bos">Şu an programda maç yok. Program girildiğinde burada görünür.</div>'; return; }
+  if (!ps.length) { $('programIcerik').innerHTML = '<div class="bos">Şu an gelecek maç yok. Maçlar belli olunca burada görünür.</div>'; return; }
   let son = null, h = '';
   for (const p of ps) {
     const [t, s, g, a, ha, b, hb, masa] = p;
