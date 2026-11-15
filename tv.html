@@ -109,9 +109,10 @@ td.ust7{color:var(--altin)}
 .mc .sk{text-align:center;font-size:calc(var(--u)*2.3)} .mc .ay{text-align:center;color:var(--soluk)}
 /* Maç programı slaytı: 10 maça kadar tek sütun büyük, fazlası iki sütun */
 .pg{display:grid;grid-auto-flow:column;column-gap:calc(var(--u)*3);height:100%}
-.pgs{display:grid;grid-template-columns:calc(var(--u)*var(--f)*3.4) calc(var(--u)*var(--f)*3.6) minmax(0,1fr) calc(var(--u)*var(--f)*4.2) minmax(0,1fr) calc(var(--u)*var(--f)*3.6);align-items:center;font-size:calc(var(--u)*var(--f));font-weight:700;border-bottom:1px solid #1b3350;min-height:0}
+.pgs{display:grid;grid-template-columns:calc(var(--u)*var(--f)*1.7 + var(--u)*.8) calc(var(--u)*var(--f)*3.4) calc(var(--u)*var(--f)*3.6) minmax(0,1fr) calc(var(--u)*var(--f)*4.2) minmax(0,1fr) calc(var(--u)*var(--f)*3.6);align-items:center;font-size:calc(var(--u)*var(--f));font-weight:700;border-bottom:1px solid #1b3350;min-height:0}
 .pgs:nth-child(even){background:#0e2136}
-.pgs .sa{color:var(--altin);padding-left:calc(var(--u)*.8);font-variant-numeric:tabular-nums}
+.pgs .no{color:#7cc0ff;text-align:right;padding-right:calc(var(--u)*.6);padding-left:calc(var(--u)*.8);font-variant-numeric:tabular-nums}
+.pgs .sa{color:var(--altin);font-variant-numeric:tabular-nums}
 .pgs .gr{color:var(--soluk);font-size:.72em;font-weight:600}
 .pgs .o1,.pgs .o2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pgs .o1{text-align:right} .pgs .h{color:var(--soluk);font-weight:600;font-size:.72em}
@@ -254,9 +255,9 @@ function programCiz(gun, sayfa, top) {
   if (!ps.length) { $('icerik').innerHTML = '<div class="bosmesaj">Programda maç yok</div>'; return; }
   const sut = ps.length > 10 ? 2 : 1, sat = Math.max(Math.ceil(ps.length / sut), 8);
   const mac = {}; for (const gr of V.gruplar) for (const [t, x, sx, z, sz] of gr.maclar) { mac[gr.no + '|' + x + '|' + z] = [sx, sz]; mac[gr.no + '|' + z + '|' + x] = [sz, sx]; }
-  $('icerik').innerHTML = `<div class="pg" style="grid-template-columns:repeat(${sut},minmax(0,1fr));grid-template-rows:repeat(${sat},minmax(0,1fr));--f:${sut === 1 ? 3.1 : 2.2}">${ps.map(([t, s, gno, x, hx, z, hz, masa]) => {
+  $('icerik').innerHTML = `<div class="pg" style="grid-template-columns:repeat(${sut},minmax(0,1fr));grid-template-rows:repeat(${sat},minmax(0,1fr));--f:${sut === 1 ? 3.1 : 2.2}">${ps.map(([t, s, gno, x, hx, z, hz, masa], i) => {
     const m = mac[gno + '|' + x + '|' + z];
-    return `<div class="pgs"><span class="sa">${esc(s || '')}</span><span class="gr">${gno}. Grup</span><span class="o1">${esc(x)} <span class="h">(${esc(hx)})</span></span>${m ? `<span class="vs sk"><span class="${sinif(m[0], m[1])}">${esc(m[0])}</span>-<span class="${sinif(m[1], m[0])}">${esc(m[1])}</span></span>` : '<span class="vs">vs</span>'}<span class="o2">${esc(z)} <span class="h">(${esc(hz)})</span></span><span class="ms">${masa ? 'Masa ' + esc(masa) : ''}</span></div>`;
+    return `<div class="pgs"><span class="no">${sayfa * PROG_SAYFA + i + 1}.</span><span class="sa">${esc(s || '')}</span><span class="gr">${gno}. Grup</span><span class="o1">${esc(x)} <span class="h">(${esc(hx)})</span></span>${m ? `<span class="vs sk"><span class="${sinif(m[0], m[1])}">${esc(m[0])}</span>-<span class="${sinif(m[1], m[0])}">${esc(m[1])}</span></span>` : '<span class="vs">vs</span>'}<span class="o2">${esc(z)} <span class="h">(${esc(hz)})</span></span><span class="ms">${masa ? 'Masa ' + esc(masa) : ''}</span></div>`;
   }).join('')}</div>`;
 }
 function icerikCiz(s) {
