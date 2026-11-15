@@ -106,6 +106,17 @@ td.ust7{color:var(--altin)}
 .mc .o1,.mc .o2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc .o1{text-align:right;padding-right:calc(var(--u)*.6)} .mc .o2{padding-left:calc(var(--u)*.6)}
 .mc .sk{text-align:center;font-size:calc(var(--u)*2.3)} .mc .ay{text-align:center;color:var(--soluk)}
+/* Maç programı slaytı: 10 maça kadar tek sütun büyük, fazlası iki sütun */
+.pg{display:grid;grid-auto-flow:column;column-gap:calc(var(--u)*3);height:100%}
+.pgs{display:grid;grid-template-columns:calc(var(--u)*var(--f)*3.4) calc(var(--u)*var(--f)*3.6) minmax(0,1fr) calc(var(--u)*var(--f)*4.2) minmax(0,1fr) calc(var(--u)*var(--f)*3.6);align-items:center;font-size:calc(var(--u)*var(--f));font-weight:700;border-bottom:1px solid #1b3350;min-height:0}
+.pgs:nth-child(even){background:#0e2136}
+.pgs .sa{color:var(--altin);padding-left:calc(var(--u)*.8);font-variant-numeric:tabular-nums}
+.pgs .gr{color:var(--soluk);font-size:.72em;font-weight:600}
+.pgs .o1,.pgs .o2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pgs .o1{text-align:right} .pgs .h{color:var(--soluk);font-weight:600;font-size:.72em}
+.pgs .vs{text-align:center;color:var(--soluk);font-size:.7em}
+.pgs .vs.sk{color:var(--yazi);font-size:1em}
+.pgs .ms{text-align:right;padding-right:calc(var(--u)*.8);color:var(--soluk);font-size:.68em;font-weight:600}
 .bosmesaj{height:100%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3);color:var(--soluk)}
 </style>
 </head>
@@ -174,7 +185,7 @@ function matrisCiz(V, sayfa) {
 // Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
 // Çapraz tablo bir ekranda 4 grup gösterir (hücrede 40-50). ?grup=6 → 6 grup (65" 4K için), ?grup=15 → 15 grup tek ekran.
 // Adres sonuna ?sabit eklenirse yalnızca 15 grubun toplu çapraz tablosu sabit gösterilir.
-const SURE = { matris: 15, puan: 15, son: 60 };   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
+const SURE = { matris: 15, puan: 15, son: 60, program: 20 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
 const SADECE_MATRIS = true;   // true: yalnızca çapraz tablo slaytları döner (puan durumu ve son maçlar kapalı)
 const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
 const P = new URLSearchParams(location.search);
@@ -194,7 +205,11 @@ function sonMaclar() {
 function plan() {
   const s = [], ms = Math.ceil(15 / GRUP);
   for (let i = 0; i < ms; i++) s.push({ t: 'matris', sayfa: i, sn: GRUP < 15 ? SURE.matris : 180 });
-  if (SABIT || SADECE_MATRIS) return s;
+  if (SABIT) return s;
+  // Maç programı: en yakın iki günün programı, 20'şer maçlık sayfalar
+  const pg = programGunleri().slice(0, 2);
+  for (const gun of pg) { const n = Math.ceil(gunProgrami(gun).length / PROG_SAYFA); for (let i = 0; i < n; i++) s.push({ t: 'program', gun, sayfa: i, top: n, sn: SURE.program }); }
+  if (SADECE_MATRIS) return s;
   for (const g of V.gruplar.slice(0, 15)) s.push({ t: 'puan', g: g.no, sn: SURE.puan });
   const n = Math.min(SON_EN_FAZLA_SAYFA, Math.ceil(sonMaclar().length / SON_SAYFA));
   for (let i = 0; i < n; i++) s.push({ t: 'son', sayfa: i, top: n, sn: Math.max(15, Math.round(SURE.son / n)) });
@@ -221,8 +236,29 @@ function sonCiz(sayfa, top) {
     `<div class="mc"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Gr</span><span class="o1">${esc(a)}</span><span class="sk ${sinif(sa, sb)}">${esc(sa)}</span><span class="ay">–</span><span class="sk ${sinif(sb, sa)}">${esc(sb)}</span><span class="o2">${esc(b)}</span></div>`).join('')}</div>`
     : '<div class="bosmesaj">Son 7 günde oynanan maç yok</div>';
 }
+// ---- Maç programı: V.program = [[t, saat, grup, a, hndA, b, hndB, masa], ...] ----
+const PROG_SAYFA = 20;
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+function gunEk(n) { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); }
+function programGunleri() { const b = gunEk(0); return [...new Set((V && V.program || []).map(p => p[0]).filter(t => t >= b))].sort(); }
+function gunProgrami(gun) { return (V && V.program || []).filter(p => p[0] === gun); }
+function programCiz(gun, sayfa, top) {
+  const hepsi = gunProgrami(gun), ps = hepsi.slice(sayfa * PROG_SAYFA, (sayfa + 1) * PROG_SAYFA);
+  const d = new Date(gun + 'T12:00'), gunAd = d.toLocaleDateString('tr-TR', { weekday: 'long' });
+  $('baslik').textContent = gun === gunEk(0) ? 'Bugünün Maçları' : gun === gunEk(1) ? 'Yarının Maçları' : 'Maç Programı';
+  const [y, a, g] = gun.split('-');
+  $('ek').textContent = `${gunAd.charAt(0).toLocaleUpperCase('tr') + gunAd.slice(1)} ${g}.${a}.${y}` + (top > 1 ? ` · ${sayfa + 1}/${top}` : '');
+  if (!ps.length) { $('icerik').innerHTML = '<div class="bosmesaj">Programda maç yok</div>'; return; }
+  const sut = ps.length > 10 ? 2 : 1, sat = Math.max(Math.ceil(ps.length / sut), 8);
+  const mac = {}; for (const gr of V.gruplar) for (const [t, x, sx, z, sz] of gr.maclar) { mac[gr.no + '|' + x + '|' + z] = [sx, sz]; mac[gr.no + '|' + z + '|' + x] = [sz, sx]; }
+  $('icerik').innerHTML = `<div class="pg" style="grid-template-columns:repeat(${sut},minmax(0,1fr));grid-template-rows:repeat(${sat},minmax(0,1fr));--f:${sut === 1 ? 3.1 : 2.2}">${ps.map(([t, s, gno, x, hx, z, hz, masa]) => {
+    const m = mac[gno + '|' + x + '|' + z];
+    return `<div class="pgs"><span class="sa">${esc(s || '')}</span><span class="gr">${gno}. Grup</span><span class="o1">${esc(x)} <span class="h">(${esc(hx)})</span></span>${m ? `<span class="vs sk"><span class="${sinif(m[0], m[1])}">${esc(m[0])}</span>-<span class="${sinif(m[1], m[0])}">${esc(m[1])}</span></span>` : '<span class="vs">vs</span>'}<span class="o2">${esc(z)} <span class="h">(${esc(hz)})</span></span><span class="ms">${masa ? 'Masa ' + esc(masa) : ''}</span></div>`;
+  }).join('')}</div>`;
+}
 function icerikCiz(s) {
   if (s.t === 'matris') matrisCiz(V, s.sayfa || 0);
+  else if (s.t === 'program') programCiz(s.gun, s.sayfa, s.top);
   else if (s.t === 'puan') puanCiz(s.g);
   else sonCiz(s.sayfa, s.top);
 }
