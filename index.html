@@ -158,15 +158,16 @@ td.p{font-weight:700;color:var(--gold)}
 @keyframes spGel{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 /* Maç programı */
 nav button.yeni::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gold);margin-left:6px;vertical-align:middle}
-.pr{display:grid;grid-template-columns:50px minmax(0,1fr) auto minmax(0,1fr);gap:2px 8px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line)}
+.pr{display:grid;grid-template-columns:22px 50px minmax(0,1fr) auto minmax(0,1fr);gap:2px 8px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line)}
 .pr:last-child{border-bottom:0}
+.pr .no{grid-row:1 / span 2;font-size:15px;font-weight:700;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
 .pr .sa{grid-row:1 / span 2;font-size:17px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .pr .o1{text-align:right;font-weight:600} .pr .o2{font-weight:600}
-@media (max-width:600px){.pr{grid-template-columns:44px minmax(0,1fr) auto minmax(0,1fr);gap:2px 6px} .pr .sa{font-size:15px} .pr .o1,.pr .o2{font-size:14px} .pr small{white-space:nowrap}}
+@media (max-width:600px){.pr{grid-template-columns:18px 42px minmax(0,1fr) auto minmax(0,1fr);gap:2px 6px} .pr .sa{font-size:15px} .pr .no{font-size:13px} .pr .o1,.pr .o2{font-size:14px} .pr small{white-space:nowrap}}
 .pr small{color:var(--muted);font-weight:400}
 .pr .vs{color:var(--muted);font-size:13px;text-align:center;min-width:26px}
 .pr .vs.skor{color:var(--text);font-size:16px}
-.pr .alt{grid-column:2 / span 3;text-align:center;font-size:12px;color:var(--muted)}
+.pr .alt{grid-column:3 / span 3;text-align:center;font-size:12px;color:var(--muted)}
 .pr [data-ad]{cursor:pointer}
 .yakin{background:rgba(224,176,74,.12);border:1px solid rgba(224,176,74,.5);border-radius:10px;padding:8px 12px;margin:0 0 10px;font-size:14px}
 .yakin b{color:var(--gold)}
@@ -394,12 +395,12 @@ function programSkor(p) { const g = V.gruplar.find(x => x.no === p[2]); return g
 function programCiz() {
   const ps = gelecekProgram();
   if (!ps.length) { $('programIcerik').innerHTML = '<div class="bos">Şu an gelecek maç yok. Maçlar belli olunca burada görünür.</div>'; return; }
-  let son = null, h = '';
+  let son = null, h = '', n = 0;
   for (const p of ps) {
     const [t, s, g, a, ha, b, hb, masa] = p;
-    if (t !== son) { h += `<div class="tarih-baslik">${esc(gunBaslik(t))}</div>`; son = t; }
+    if (t !== son) { h += `<div class="tarih-baslik">${esc(gunBaslik(t))}</div>`; son = t; n = 0; }
     const m = programSkor(p);
-    h += `<div class="pr"><div class="sa">${esc(s || '—')}</div>
+    h += `<div class="pr"><div class="no">${++n}.</div><div class="sa">${esc(s || '—')}</div>
       <div class="o1" data-ad="${esc(a)}">${esc(a)} <small>(${esc(ha)})</small></div>
       <div class="vs${m ? ' skor' : ''}">${m ? `<b>${esc(m[0])} - ${esc(m[1])}</b>` : 'vs'}</div>
       <div class="o2" data-ad="${esc(b)}">${esc(b)} <small>(${esc(hb)})</small></div>
