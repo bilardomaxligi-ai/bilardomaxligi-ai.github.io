@@ -37,7 +37,7 @@ button{font:inherit;cursor:pointer}
 .not{margin-top:10px;padding:10px 12px;border-radius:9px;background:#3a2410;border:1px solid #b5651d;color:#ffd9a8;font-size:15px;line-height:1.5}
 .btn.turuncu{background:#e07a1f;color:#1a0d00}
 .sekmeler{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:#0e1d30;border-top:1px solid var(--cizgi);padding-bottom:env(safe-area-inset-bottom)}
-.sekmeler button{flex:1;background:none;border:0;color:var(--soluk);padding:10px 4px 12px;font-size:13px;font-weight:600}
+.sekmeler button{flex:1;min-width:0;background:none;border:0;color:var(--soluk);padding:10px 1px 12px;font-size:12px;font-weight:600;white-space:nowrap}
 .sekmeler button span{display:block;font-size:20px;line-height:1.2}
 .sekmeler button.on{color:var(--altin)}
 .liste .mac{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #1d3550}
@@ -98,6 +98,11 @@ dialog p{margin:4px 0 0;line-height:1.45}
   <main>
     <!-- SKOR GİR -->
     <section id="s-skor">
+      <div class="kart gizli" id="sProgKart">
+        <h2>Bugünün programı</h2>
+        <div style="color:var(--soluk);font-size:13px">Skoru girilmemiş maçlar. Dokununca oyuncular seçilir.</div>
+        <div id="sProg"></div>
+      </div>
       <div class="kart">
         <h2>Skor gir</h2>
         <label for="sGrup">Grup</label><select id="sGrup"></select>
@@ -113,6 +118,27 @@ dialog p{margin:4px 0 0;line-height:1.45}
           <button class="btn ikincil" id="sVazgec">Vazgeç (kaydetmeden temizle)</button>
           <button class="btn sil gizli" id="sSil">Bu maçı sil</button>
         </div>
+      </div>
+    </section>
+    <!-- PROGRAM -->
+    <section id="s-program" class="gizli">
+      <div class="kart">
+        <h2>Maç programı</h2>
+        <label for="pTarih">Gün</label>
+        <div class="satir" style="align-items:center"><button class="mini" id="pOnceki" style="flex:none">◀</button><input id="pTarih" type="date"><button class="mini" id="pSonraki" style="flex:none">▶</button></div>
+        <div id="pGunBas" style="margin-top:10px;font-weight:700;color:var(--altin)"></div>
+        <div class="liste" id="pListe" style="margin-top:4px"></div>
+        <div style="color:var(--soluk);font-size:13px;margin-top:8px">Program sitede ve TV'de görünür. "Skor" ile maçın skorunu girersiniz.</div>
+      </div>
+      <div class="kart" id="pForm">
+        <h2 id="pFormBas">Programa maç ekle</h2>
+        <div class="satir"><div><label for="pSaat">Saat</label><input id="pSaat" type="time" step="300"></div><div><label for="pMasa">Masa (isteğe bağlı)</label><input id="pMasa" maxlength="12" autocomplete="off"></div></div>
+        <label for="pGrup">Grup</label><select id="pGrup"></select>
+        <label for="pO1">1. oyuncu</label><select id="pO1"></select>
+        <label for="pO2">2. oyuncu</label><select id="pO2"></select>
+        <div id="pUyari" class="not gizli"></div>
+        <button class="btn" id="pKaydet">Programa ekle</button>
+        <button class="btn ikincil gizli" id="pVazgec">Düzenlemeyi bırak</button>
       </div>
     </section>
     <!-- MAÇLAR -->
@@ -166,9 +192,10 @@ dialog p{margin:4px 0 0;line-height:1.45}
   </main>
   <nav class="sekmeler">
     <button data-s="skor" class="on"><span>✎</span>Skor gir</button>
+    <button data-s="program"><span>📅</span>Program</button>
     <button data-s="mac"><span>☰</span>Maçlar</button>
     <button data-s="ara"><span>🔍</span>Ara</button>
-    <button data-s="oyuncu"><span>👤</span>Oyuncular</button>
+    <button data-s="oyuncu"><span>👤</span>Oyuncu</button>
     <button data-s="ayar"><span>⚙</span>Ayarlar</button>
   </nav>
 </div>
@@ -241,14 +268,16 @@ $('yenileBtn').onclick = () => islem({ islem: 'veri' }).then(c => c && tost('Gü
 document.querySelectorAll('.sekmeler button').forEach(b => b.onclick = () => sekme(b.dataset.s));
 function sekme(s) {
   document.querySelectorAll('.sekmeler button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
-  ['skor', 'mac', 'ara', 'oyuncu', 'ayar'].forEach(k => $('s-' + k).classList.toggle('gizli', k !== s));
+  ['skor', 'program', 'mac', 'ara', 'oyuncu', 'ayar'].forEach(k => $('s-' + k).classList.toggle('gizli', k !== s));
   window.scrollTo(0, 0);
 }
 
 // ---- veri yardımcıları ----
 const grupOyunculari = g => ana.oyuncular.filter(o => o.grup === g).sort((x, y) => (y.hnd - x.hnd) || (x.no - y.no));
 const macBul = (g, a, b) => ana.maclar.find(m => m.g === g && ((m.a === a && m.b === b) || (m.a === b && m.b === a)));
-const bugun = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const bugun = () => ymd(new Date());
+const yarin = () => { const d = new Date(); d.setDate(d.getDate() + 1); return ymd(d); };
 const tarihKisa = t => { const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[3]}.${m[2]}` : '—'; };
 const tarihUzun = t => { const m = /^(\d{4})-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[3]}.${m[2]}.${m[1]}` : 'tarihsiz'; };
 
@@ -261,9 +290,83 @@ function grupSecenekleri(sel) {
 function ciz() {
   if (!ana) return;
   $('guncel').textContent = 'Son güncelleme: ' + tarihUzun(ana.guncelleme) + ' ' + (String(ana.guncelleme || '').slice(11) || '');
-  ['sGrup', 'mGrup', 'oGrup'].forEach(id => { if (!$(id).options.length) grupSecenekleri($(id)); });
+  ['sGrup', 'mGrup', 'oGrup', 'pGrup'].forEach(id => { if (!$(id).options.length) grupSecenekleri($(id)); });
   if (!$('mGrup').querySelector('[value=son]')) { $('mGrup').insertAdjacentHTML('afterbegin', '<option value="son">📅 Gün gün (tüm gruplar)</option>'); $('mGrup').value = 'son'; }
-  skorCiz(); macCiz(); oyuncuCiz(); araCiz();
+  skorCiz(); macCiz(); oyuncuCiz(); araCiz(); programCiz(); bugunProgramCiz();
+}
+
+// ---- maç programı ----
+let pDuzen = null;
+const ayniMac = (p, q) => p.t === q.t && p.g === q.g && ((p.a === q.a && p.b === q.b) || (p.a === q.b && p.b === q.a));
+const programGunleri = () => [...new Set((ana.program || []).map(p => p.t))].sort();
+const gunEtiket = t => t === bugun() ? 'Bugün' : t === yarin() ? 'Yarın' : (d => isNaN(d) ? '' : d.toLocaleDateString('tr-TR', { weekday: 'long' }))(new Date(t + 'T12:00'));
+const saatSira = (x, y) => (x.s || '99').localeCompare(y.s || '99') || (x.g - y.g);
+function programCiz() {
+  if (!$('pTarih').value) $('pTarih').value = yarin();
+  const gun = $('pTarih').value, gl = programGunleri();
+  $('pOnceki').disabled = !gl.some(x => x < gun); $('pSonraki').disabled = !gl.some(x => x > gun);
+  const ps = (ana.program || []).filter(p => p.t === gun).sort(saatSira);
+  $('pGunBas').textContent = `${tarihUzun(gun)} ${gunEtiket(gun)} · ${ps.length} maç`;
+  $('pListe').innerHTML = ps.length ? ps.map((p, i) => {
+    const m = macBul(p.g, p.a, p.b), sk = m ? (m.a === p.a ? [m.sa, m.sb] : [m.sb, m.sa]) : null;
+    return `<div class="mac"><span class="tr" style="font-weight:700;color:var(--yazi);font-size:15px">${esc(p.s || '—')}</span><div class="ic"><small style="color:var(--soluk)">${p.g}. Grup${p.masa ? ' · Masa ' + esc(p.masa) : ''}</small><br>${esc(p.a)} ${sk ? `<b><span class="${sinif(sk[0], sk[1])}">${sk[0]}</span>-<span class="${sinif(sk[1], sk[0])}">${sk[1]}</span></b>` : '<span style="color:var(--soluk)">–</span>'} ${esc(p.b)}</div><button class="mini" data-k="${i}">${sk ? '✓' : 'Skor'}</button><button class="mini" data-d="${i}">✎</button><button class="mini sil" data-s="${i}">🗑</button></div>`;
+  }).join('') : '<div class="bos">Bu gün için programda maç yok</div>';
+  $('pListe').querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const p = ps[+b.dataset.k]; duzenle(p); });
+  $('pListe').querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+    const p = ps[+b.dataset.d]; pDuzen = Object.assign({}, p);
+    $('pGrup').value = p.g; $('pO1').value = ''; $('pO2').value = ''; pFormCiz();
+    $('pO1').value = p.a; pFormCiz(); $('pO2').value = p.b; $('pSaat').value = p.s || ''; $('pMasa').value = p.masa || ''; pFormCiz();
+    $('pForm').scrollIntoView({ behavior: 'smooth' });
+  });
+  $('pListe').querySelectorAll('[data-s]').forEach(b => b.onclick = async () => {
+    const p = ps[+b.dataset.s];
+    if (await onayla(`${p.a} – ${p.b} maçı programdan çıkarılsın mı?`)) { if (pDuzen && ayniMac(pDuzen, p)) pDuzen = null; islem({ islem: 'programSil', t: p.t, g: p.g, a: p.a, b: p.b }); }
+  });
+  pFormCiz();
+}
+function pFormCiz() {
+  const g = +$('pGrup').value, ol = grupOyunculari(g), o1 = $('pO1').value, o2 = $('pO2').value, gun = $('pTarih').value;
+  const progda = ad => (ana.program || []).some(p => p.t === gun && (p.a === ad || p.b === ad) && !(pDuzen && ayniMac(p, pDuzen)));
+  $('pO1').innerHTML = '<option value="">Seçin…</option>' + ol.map(o => `<option value="${esc(o.ad)}">${esc(o.ad)} (${o.hnd})${progda(o.ad) ? ' · o gün programda' : ''}</option>`).join('');
+  $('pO1').value = ol.some(o => o.ad === o1) ? o1 : '';
+  const a = $('pO1').value;
+  $('pO2').innerHTML = '<option value="">Seçin…</option>' + ol.filter(o => o.ad !== a).map(o => {
+    const m = a && macBul(g, a, o.ad);
+    return `<option value="${esc(o.ad)}">${esc(o.ad)} (${o.hnd})${m ? ' — oynandı' : ''}${progda(o.ad) ? ' · o gün programda' : ''}</option>`;
+  }).join('');
+  $('pO2').disabled = !a;
+  $('pO2').value = a && ol.some(o => o.ad === o2 && o2 !== a) ? o2 : '';
+  const b = $('pO2').value, m = a && b && macBul(g, a, b);
+  $('pUyari').classList.toggle('gizli', !m);
+  if (m) $('pUyari').innerHTML = `⚠ Bu iki oyuncu daha önce oynadı (${tarihUzun(m.t)}). Yine de programa eklenebilir.`;
+  $('pKaydet').textContent = pDuzen ? 'Değişikliği kaydet' : 'Programa ekle';
+  $('pFormBas').textContent = pDuzen ? 'Programdaki maçı düzenle' : 'Programa maç ekle';
+  $('pVazgec').classList.toggle('gizli', !pDuzen);
+}
+$('pGrup').onchange = () => { $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); };
+$('pO1').onchange = pFormCiz; $('pO2').onchange = pFormCiz;
+$('pTarih').onchange = programCiz;
+function pGunKaydir(yon) {
+  const gl = programGunleri(), gun = $('pTarih').value;
+  const h = yon < 0 ? gl.filter(x => x < gun).pop() : gl.find(x => x > gun);
+  if (h) { $('pTarih').value = h; programCiz(); }
+}
+$('pOnceki').onclick = () => pGunKaydir(-1);
+$('pSonraki').onclick = () => pGunKaydir(1);
+$('pVazgec').onclick = () => { pDuzen = null; $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); };
+$('pKaydet').onclick = async () => {
+  const a = $('pO1').value, b = $('pO2').value, t = $('pTarih').value;
+  if (!t) return tost('Gün seçin', true);
+  if (!a || !b) return tost('İki oyuncuyu seçin', true);
+  const c = await islem({ islem: 'programKaydet', t, s: $('pSaat').value, masa: $('pMasa').value, g: +$('pGrup').value, a, b, eskiT: pDuzen ? pDuzen.t : '' });
+  if (c) { pDuzen = null; $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); }
+};
+// Skor gir sekmesinin üstünde: bugünün programında skoru girilmemiş maçlar
+function bugunProgramCiz() {
+  const ps = (ana.program || []).filter(p => p.t === bugun() && !macBul(p.g, p.a, p.b)).sort(saatSira);
+  $('sProgKart').classList.toggle('gizli', !ps.length);
+  $('sProg').innerHTML = ps.map((p, i) => `<button class="secim" data-i="${i}"><span><b style="color:var(--altin)">${esc(p.s || '')}</b> ${esc(p.a)} – ${esc(p.b)}</span><small>${p.g}. Grup${p.masa ? ' · M' + esc(p.masa) : ''}</small></button>`).join('');
+  $('sProg').querySelectorAll('[data-i]').forEach(b => b.onclick = () => duzenle(ps[+b.dataset.i]));
 }
 
 // ---- skor gir ----
