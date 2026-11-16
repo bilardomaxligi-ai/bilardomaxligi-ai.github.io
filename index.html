@@ -390,7 +390,7 @@ function gunBaslik(t) {
   return (t === gunEk(0) ? 'Bugün · ' : t === gunEk(1) ? 'Yarın · ' : '') + ad + ' ' + tarihYaz(t);
 }
 // Bugün ve sonrası: [t, saat, grup, a, hndA, b, hndB, masa]
-function gelecekProgram() { const b = gunEk(0); return (V && V.program || []).filter(p => p[0] >= b); }
+function gelecekProgram() { const b = gunEk(0); return (V && V.program || []).filter(p => p[0] >= b && !programSkor(p)); }
 function programSkor(p) { const g = V.gruplar.find(x => x.no === p[2]); return g && g.mac[p[3] + '|' + p[5]]; }
 function programCiz() {
   const ps = gelecekProgram();
