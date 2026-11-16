@@ -100,10 +100,10 @@ td.ust7{color:var(--altin)}
 .pt td.p{color:var(--altin);font-size:calc(var(--u)*3.2)}
 .pt td.hh,.pt td.ikincil{color:var(--soluk);font-weight:600}
 .sm{display:grid;grid-auto-flow:column;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(16,minmax(0,1fr));column-gap:calc(var(--u)*2.4);height:100%}
-.mc{display:grid;grid-template-columns:calc(var(--u)*5.4) calc(var(--u)*5.6) minmax(0,1fr) calc(var(--u)*3.4) calc(var(--u)*1.4) calc(var(--u)*3.4) minmax(0,1fr);align-items:center;font-size:calc(var(--u)*2.05);font-weight:700;border-bottom:1px solid #1b3350;min-height:0}
+.mc{display:grid;grid-template-columns:calc(var(--u)*4.6) calc(var(--u)*7.2) minmax(0,1fr) calc(var(--u)*3.4) calc(var(--u)*1.4) calc(var(--u)*3.4) minmax(0,1fr);align-items:center;font-size:calc(var(--u)*2.05);font-weight:700;border-bottom:1px solid #1b3350;min-height:0}
 .mc:nth-child(even){background:#0e2136}
 .mc .tr{color:var(--soluk);font-weight:600;font-size:calc(var(--u)*1.75);padding-left:calc(var(--u)*.5)}
-.mc .gr{color:var(--altin);font-size:calc(var(--u)*1.75);white-space:nowrap}
+.mc .gr{color:var(--altin);font-size:calc(var(--u)*1.6);white-space:nowrap}
 .mc .o1,.mc .o2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc .o1{text-align:right;padding-right:calc(var(--u)*.6)} .mc .o2{padding-left:calc(var(--u)*.6)}
 .mc .sk{text-align:center;font-size:calc(var(--u)*2.3)} .mc .ay{text-align:center;color:var(--soluk)}
@@ -245,7 +245,7 @@ function sonCiz(sayfa, top) {
   $('ek').textContent = top > 1 ? `Sayfa ${sayfa + 1} / ${top}` : `${ms.length} maç`;
   const tr = t => { const m = /^\d{4}-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[2]}.${m[1]}` : ''; };
   $('icerik').innerHTML = parca.length ? `<div class="sm">${parca.map(([t, a, sa, b, sb, gno]) =>
-    `<div class="mc"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Gr</span><span class="o1">${esc(a)}</span><span class="sk ${sinif(sa, sb)}">${esc(sa)}</span><span class="ay">–</span><span class="sk ${sinif(sb, sa)}">${esc(sb)}</span><span class="o2">${esc(b)}</span></div>`).join('')}</div>`
+    `<div class="mc"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Grup</span><span class="o1">${esc(a)}</span><span class="sk ${sinif(sa, sb)}">${esc(sa)}</span><span class="ay">–</span><span class="sk ${sinif(sb, sa)}">${esc(sb)}</span><span class="o2">${esc(b)}</span></div>`).join('')}</div>`
     : '<div class="bosmesaj">Son 7 günde oynanan maç yok</div>';
 }
 // ---- Maç programı: V.program = [[t, saat, grup, a, hndA, b, hndB, masa], ...] ----
@@ -304,7 +304,7 @@ function seritCiz() {
   if (!ms.length) { ic.innerHTML = '<span class="si">Henüz oynanan maç yok</span>'; seritYarim = 0; seritX = 0; ic.style.transform = 'translate3d(0,0,0)'; return; }
   const tr = t => { const m = /^\d{4}-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[2]}.${m[1]}` : ''; };
   const parca = ms.map(([t, a, sa, b, sb, gno]) =>
-    `<span class="si"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Gr</span>${esc(a)} <span class="${sinif(sa, sb)}">${esc(sa)}</span>-<span class="${sinif(sb, sa)}">${esc(sb)}</span> ${esc(b)}</span><span class="ay">●</span>`).join('');
+    `<span class="si"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Grup</span>${esc(a)} <span class="${sinif(sa, sb)}">${esc(sa)}</span>-<span class="${sinif(sb, sa)}">${esc(sb)}</span> ${esc(b)}</span><span class="ay">●</span>`).join('');
   // Liste ekrandan kısaysa ekranı dolduracak kadar tekrarla; sonra iki kopya yan yana koy ki kesintisiz dönsün
   ic.innerHTML = parca; const w = ic.scrollWidth || 1, r = Math.max(1, Math.ceil(ic.parentElement.clientWidth / w));
   const birim = parca.repeat(r); ic.innerHTML = birim + birim;
