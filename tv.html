@@ -337,6 +337,18 @@ yukle(); setInterval(yukle, YENILE_SN * 1000);
 document.addEventListener('keydown', e => { if (e.key === 'ArrowRight') ilerle(1); else if (e.key === 'ArrowLeft') ilerle(-1); });
 // Güvenlik için her 6 saatte bir sayfayı tamamen yenile (bellek, olası takılma)
 setTimeout(() => location.reload(), 6 * 3600 * 1000);
+// Sayfanın yeni sürümü yayınlanınca kendini yenile (2 dakikada bir kontrol)
+let surum = null;
+async function surumBak() {
+  try {
+    const r = await fetch(location.pathname + '?s=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const t = await r.text();
+    if (t.length < 5000 || !t.includes('surumBak')) return;
+    if (surum === null) surum = t; else if (t !== surum) location.reload();
+  } catch (e) {}
+}
+surumBak(); setInterval(surumBak, 2 * 60 * 1000);
 // Ekran kararmasın (destekleyen tarayıcılarda)
 let kilit = null;
 async function uyanik() { try { if ('wakeLock' in navigator && document.visibilityState === 'visible') kilit = await navigator.wakeLock.request('screen'); } catch (e) {} }
