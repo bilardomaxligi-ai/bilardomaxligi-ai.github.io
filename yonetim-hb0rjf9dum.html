@@ -280,7 +280,10 @@ setInterval(bosKontrol, 20000);
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') bosKontrol(); });
 
 // ---- sekmeler ----
-document.querySelectorAll('.sekmeler button').forEach(b => b.onclick = () => sekme(b.dataset.s));
+document.querySelectorAll('.sekmeler button').forEach(b => b.onclick = () => {
+  if (b.dataset.s === 'program' && ana) { $('pTarih').value = bugun(); programCiz(); }   // Program sekmesi hep bugünle açılır
+  sekme(b.dataset.s);
+});
 function sekme(s) {
   document.querySelectorAll('.sekmeler button').forEach(b => b.classList.toggle('on', b.dataset.s === s));
   ['skor', 'program', 'mac', 'ara', 'oyuncu', 'ayar'].forEach(k => $('s-' + k).classList.toggle('gizli', k !== s));
@@ -317,7 +320,7 @@ const programGunleri = () => [...new Set((ana.program || []).map(p => p.t))].sor
 const gunEtiket = t => t === bugun() ? 'Bugün' : t === yarin() ? 'Yarın' : (d => isNaN(d) ? '' : d.toLocaleDateString('tr-TR', { weekday: 'long' }))(new Date(t + 'T12:00'));
 const saatSira = (x, y) => (x.s || '99').localeCompare(y.s || '99') || (x.g - y.g);
 function programCiz() {
-  if (!$('pTarih').value) $('pTarih').value = yarin();
+  if (!$('pTarih').value) $('pTarih').value = bugun();
   const gun = $('pTarih').value, gl = programGunleri();
   $('pOnceki').disabled = !gl.some(x => x < gun); $('pSonraki').disabled = !gl.some(x => x > gun);
   const ps = (ana.program || []).filter(p => p.t === gun).sort(saatSira);
