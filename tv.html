@@ -206,13 +206,12 @@ function sonMaclar() {
   return hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
 }
 function seritMaclari() {
-  // Kayan yazı: bugün ve dün oynanan maçlar; bu iki günde maç yoksa (ör. hafta sonu) maç oynanan en son gün
+  // Kayan yazı: maç oynanan son 2 günün maçları (maçsız günler atlanır)
   const hepsi = [];
   for (const g of V.gruplar) for (const m of g.maclar) if (m[0]) hepsi.push([...m, g.no]);
   hepsi.sort((x, y) => y[0].localeCompare(x[0]));
-  const dun = gunEk(-1), yakin = hepsi.filter(m => m[0] >= dun);
-  if (yakin.length) return yakin;
-  return hepsi.length ? hepsi.filter(m => m[0] === hepsi[0][0]) : [];
+  const gunler = [...new Set(hepsi.map(m => m[0]))].slice(0, 2);
+  return hepsi.filter(m => gunler.includes(m[0]));
 }
 function plan() {
   const s = [], ms = Math.ceil(15 / GRUP);
