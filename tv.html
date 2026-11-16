@@ -205,6 +205,16 @@ function sonMaclar() {
   for (const g of V.gruplar) for (const m of g.maclar) if (m[0] && m[0] >= sinir) hepsi.push([...m, g.no]);
   return hepsi.sort((x, y) => (y[0] || '').localeCompare(x[0] || ''));
 }
+function seritMaclari() {
+  // Kayan yazı: bugün ve dün oynanan maçlar; bu iki günde maç yoksa maç oynanan son iki gün
+  const hepsi = [];
+  for (const g of V.gruplar) for (const m of g.maclar) if (m[0]) hepsi.push([...m, g.no]);
+  hepsi.sort((x, y) => y[0].localeCompare(x[0]));
+  const dun = gunEk(-1), yakin = hepsi.filter(m => m[0] >= dun);
+  if (yakin.length) return yakin;
+  const gunler = [...new Set(hepsi.map(m => m[0]))].slice(0, 2);
+  return hepsi.filter(m => gunler.includes(m[0]));
+}
 function plan() {
   const s = [], ms = Math.ceil(15 / GRUP);
   for (let i = 0; i < ms; i++) s.push({ t: 'matris', sayfa: i, sn: GRUP < 15 ? SURE.matris : 180 });
@@ -291,8 +301,8 @@ function ilerle(y) {
 const SERIT_HIZ = 14;   // saniyede kaç birim kayar (1080p ekranda ≈ 150 piksel/sn)
 let seritX = 0, seritYarim = 0, seritSon = 0;
 function seritCiz() {
-  const ic = $('seritIc'), ms = sonMaclar();
-  if (!ms.length) { ic.innerHTML = '<span class="si">Son 7 günde oynanan maç yok</span>'; seritYarim = 0; seritX = 0; ic.style.transform = 'translate3d(0,0,0)'; return; }
+  const ic = $('seritIc'), ms = seritMaclari();
+  if (!ms.length) { ic.innerHTML = '<span class="si">Henüz oynanan maç yok</span>'; seritYarim = 0; seritX = 0; ic.style.transform = 'translate3d(0,0,0)'; return; }
   const tr = t => { const m = /^\d{4}-(\d\d)-(\d\d)/.exec(t || ''); return m ? `${m[2]}.${m[1]}` : ''; };
   const parca = ms.map(([t, a, sa, b, sb, gno]) =>
     `<span class="si"><span class="tr">${tr(t)}</span><span class="gr">${gno}. Gr</span>${esc(a)} <span class="${sinif(sa, sb)}">${esc(sa)}</span>-<span class="${sinif(sb, sa)}">${esc(sb)}</span> ${esc(b)}</span><span class="ay">●</span>`).join('');
