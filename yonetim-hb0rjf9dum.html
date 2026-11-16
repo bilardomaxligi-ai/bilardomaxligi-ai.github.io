@@ -253,6 +253,7 @@ $('kBtn').onclick = async () => {
 };
 async function girisYap(t) {
   token = t; try { sessionStorage.setItem('bm_yonetim', t); } catch (e) {}
+  hareket();
   $('gSifre').value = ''; $('kSifre').value = ''; $('kSifre2').value = '';
   const c = await islem({ islem: 'veri' });
   if (c) { $('giris').classList.add('gizli'); $('uyg').classList.remove('gizli'); }
@@ -264,6 +265,19 @@ function cikis(sessiz) {
 }
 $('cikisBtn').onclick = () => cikis(false);
 $('yenileBtn').onclick = () => islem({ islem: 'veri' }).then(c => c && tost('Güncel'));
+
+// ---- 10 dakika işlem yapılmazsa otomatik çıkış ----
+const BOS_DK = 10;
+let sonHareket = Date.now();
+try { const s = +sessionStorage.getItem('bm_hareket'); if (s) sonHareket = s; } catch (e) {}
+function hareket() { sonHareket = Date.now(); try { sessionStorage.setItem('bm_hareket', String(sonHareket)); } catch (e) {} }
+['click', 'keydown', 'touchstart', 'input', 'scroll'].forEach(o => addEventListener(o, hareket, { passive: true, capture: true }));
+function bosKontrol() {
+  if (token && Date.now() - sonHareket > BOS_DK * 60000) { cikis(false); tost(BOS_DK + ' dakika işlem yapılmadığı için çıkış yapıldı', true); }
+}
+bosKontrol();
+setInterval(bosKontrol, 20000);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') bosKontrol(); });
 
 // ---- sekmeler ----
 document.querySelectorAll('.sekmeler button').forEach(b => b.onclick = () => sekme(b.dataset.s));
