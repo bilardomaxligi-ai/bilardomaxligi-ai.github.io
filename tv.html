@@ -243,8 +243,9 @@ function sonCiz(sayfa, top) {
 const PROG_SAYFA = 20;
 const ymd = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 function gunEk(n) { const d = new Date(); d.setDate(d.getDate() + n); return ymd(d); }
-function programGunleri() { const b = gunEk(0); return [...new Set((V && V.program || []).map(p => p[0]).filter(t => t >= b))].sort(); }
-function gunProgrami(gun) { return (V && V.program || []).filter(p => p[0] === gun); }
+function oynanmamis() { const o = new Set(); for (const gr of (V && V.gruplar || [])) for (const [t, x, sx, z] of gr.maclar) { o.add(gr.no + '|' + x + '|' + z); o.add(gr.no + '|' + z + '|' + x); } return (V && V.program || []).filter(p => !o.has(p[2] + '|' + p[3] + '|' + p[5])); }
+function programGunleri() { const b = gunEk(0); return [...new Set(oynanmamis().map(p => p[0]).filter(t => t >= b))].sort(); }
+function gunProgrami(gun) { return oynanmamis().filter(p => p[0] === gun); }
 function programCiz(gun, sayfa, top) {
   const hepsi = gunProgrami(gun), ps = hepsi.slice(sayfa * PROG_SAYFA, (sayfa + 1) * PROG_SAYFA);
   const d = new Date(gun + 'T12:00'), gunAd = d.toLocaleDateString('tr-TR', { weekday: 'long' });
