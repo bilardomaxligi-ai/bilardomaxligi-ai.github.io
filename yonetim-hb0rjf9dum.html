@@ -210,7 +210,8 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const sinif = (a, b) => a > b ? 'k' : a < b ? 'm' : 'b';
 let token = '', ana = null, mesgul = false;
-try { token = localStorage.getItem('bm_yonetim') || ''; } catch (e) {}
+// Giriş yalnızca bu sekme açıkken geçerli: sekme/tarayıcı kapanınca şifre yeniden sorulur
+try { localStorage.removeItem('bm_yonetim'); token = sessionStorage.getItem('bm_yonetim') || ''; } catch (e) {}
 
 async function istek(o) {
   const r = await fetch(ADRES, { method: 'POST', body: JSON.stringify(o) });
@@ -251,14 +252,14 @@ $('kBtn').onclick = async () => {
   tost('Şifre kaydedildi'); girisYap(c.token);
 };
 async function girisYap(t) {
-  token = t; try { localStorage.setItem('bm_yonetim', t); } catch (e) {}
+  token = t; try { sessionStorage.setItem('bm_yonetim', t); } catch (e) {}
   $('gSifre').value = ''; $('kSifre').value = ''; $('kSifre2').value = '';
   const c = await islem({ islem: 'veri' });
   if (c) { $('giris').classList.add('gizli'); $('uyg').classList.remove('gizli'); }
 }
 function cikis(sessiz) {
   if (!sessiz && token) istek({ islem: 'cikis', token }).catch(() => {});
-  token = ''; ana = null; try { localStorage.removeItem('bm_yonetim'); } catch (e) {}
+  token = ''; ana = null; try { sessionStorage.removeItem('bm_yonetim'); } catch (e) {}
   $('uyg').classList.add('gizli'); $('giris').classList.remove('gizli');
 }
 $('cikisBtn').onclick = () => cikis(false);
@@ -579,7 +580,7 @@ $('oGrup').onchange = oyuncuCiz;
 $('aBtn').onclick = async () => {
   if ($('aYeni').value !== $('aYeni2').value) return tost('Yeni şifreler aynı değil', true);
   const c = await islem({ islem: 'sifreDegistir', eski: $('aEski').value, yeni: $('aYeni').value });
-  if (c && c.token) { token = c.token; try { localStorage.setItem('bm_yonetim', token); } catch (e) {} ['aEski', 'aYeni', 'aYeni2'].forEach(id => $(id).value = ''); }
+  if (c && c.token) { token = c.token; try { sessionStorage.setItem('bm_yonetim', token); } catch (e) {} ['aEski', 'aYeni', 'aYeni2'].forEach(id => $(id).value = ''); }
 };
 
 // ---- açılış ----
