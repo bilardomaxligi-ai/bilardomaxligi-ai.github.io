@@ -132,6 +132,7 @@ dialog p{margin:4px 0 0;line-height:1.45}
       </div>
       <div class="kart" id="pForm">
         <h2 id="pFormBas">Programa maç ekle</h2>
+        <label for="pFTarih">Tarih</label><input id="pFTarih" type="date">
         <div class="satir"><div><label for="pSaat">Saat</label><input id="pSaat" type="time" step="300"></div><div><label for="pMasa">Masa (isteğe bağlı)</label><input id="pMasa" maxlength="12" autocomplete="off"></div></div>
         <label for="pGrup">Grup</label><select id="pGrup"></select>
         <label for="pO1">1. oyuncu</label><select id="pO1"></select>
@@ -333,7 +334,7 @@ function programCiz() {
   $('pListe').querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
     const p = ps[+b.dataset.d]; pDuzen = Object.assign({}, p);
     $('pGrup').value = p.g; $('pO1').value = ''; $('pO2').value = ''; pFormCiz();
-    $('pO1').value = p.a; pFormCiz(); $('pO2').value = p.b; $('pSaat').value = p.s || ''; $('pMasa').value = p.masa || ''; pFormCiz();
+    $('pFTarih').value = p.t; $('pO1').value = p.a; pFormCiz(); $('pO2').value = p.b; $('pSaat').value = p.s || ''; $('pMasa').value = p.masa || ''; pFormCiz();
     $('pForm').scrollIntoView({ behavior: 'smooth' });
   });
   $('pListe').querySelectorAll('[data-s]').forEach(b => b.onclick = async () => {
@@ -343,7 +344,8 @@ function programCiz() {
   pFormCiz();
 }
 function pFormCiz() {
-  const g = +$('pGrup').value, ol = grupOyunculari(g), o1 = $('pO1').value, o2 = $('pO2').value, gun = $('pTarih').value;
+  if (!$('pFTarih').value) $('pFTarih').value = yarin();   // yeni maç girişi varsayılan olarak yarına
+  const g = +$('pGrup').value, ol = grupOyunculari(g), o1 = $('pO1').value, o2 = $('pO2').value, gun = $('pFTarih').value;
   const progda = ad => (ana.program || []).some(p => p.t === gun && (p.a === ad || p.b === ad) && !(pDuzen && ayniMac(p, pDuzen)));
   $('pO1').innerHTML = '<option value="">Seçin…</option>' + ol.map(o => `<option value="${esc(o.ad)}">${esc(o.ad)} (${o.hnd})${progda(o.ad) ? ' · o gün programda' : ''}</option>`).join('');
   $('pO1').value = ol.some(o => o.ad === o1) ? o1 : '';
@@ -362,7 +364,7 @@ function pFormCiz() {
   $('pVazgec').classList.toggle('gizli', !pDuzen);
 }
 $('pGrup').onchange = () => { $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); };
-$('pO1').onchange = pFormCiz; $('pO2').onchange = pFormCiz;
+$('pO1').onchange = pFormCiz; $('pO2').onchange = pFormCiz; $('pFTarih').onchange = pFormCiz;
 $('pTarih').onchange = programCiz;
 function pGunKaydir(yon) {
   const gl = programGunleri(), gun = $('pTarih').value;
@@ -371,13 +373,13 @@ function pGunKaydir(yon) {
 }
 $('pOnceki').onclick = () => pGunKaydir(-1);
 $('pSonraki').onclick = () => pGunKaydir(1);
-$('pVazgec').onclick = () => { pDuzen = null; $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); };
+$('pVazgec').onclick = () => { pDuzen = null; $('pFTarih').value = yarin(); $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); };
 $('pKaydet').onclick = async () => {
-  const a = $('pO1').value, b = $('pO2').value, t = $('pTarih').value;
-  if (!t) return tost('Gün seçin', true);
+  const a = $('pO1').value, b = $('pO2').value, t = $('pFTarih').value;
+  if (!t) return tost('Tarih seçin', true);
   if (!a || !b) return tost('İki oyuncuyu seçin', true);
   const c = await islem({ islem: 'programKaydet', t, s: $('pSaat').value, masa: $('pMasa').value, g: +$('pGrup').value, a, b, eskiT: pDuzen ? pDuzen.t : '' });
-  if (c) { pDuzen = null; $('pO1').value = ''; $('pO2').value = ''; pFormCiz(); }
+  if (c) { pDuzen = null; $('pO1').value = ''; $('pO2').value = ''; $('pTarih').value = t; programCiz(); }   // listede eklenen günü göster
 };
 // Skor gir sekmesinin üstünde: bugünün programında skoru girilmemiş maçlar
 function bugunProgramCiz() {
