@@ -66,6 +66,8 @@ td.ust7{color:var(--altin)}
 .pd th,.pd td{font-size:calc(var(--u)*var(--carp)*1.1)}
 .pd td.ad{font-size:calc(var(--u)*var(--carp)*1.25)}
 .pd td.pk{color:var(--k)} .pd td.pm{color:var(--m)}
+.pd td.sira{color:var(--altin)}
+.pd tr.ayrac td{border-bottom:calc(var(--u)*.3) dashed var(--altin)}   /* ilk 7'nin altına kesik çizgi */
 .buyuk td.sk2{font-weight:700;letter-spacing:-.03em;font-size:calc(var(--u)*var(--carp)*.88)}
 .buyuk td.ek{font-weight:800}
 /* Sütun başlığında oyuncu adı (dikey) */
@@ -194,14 +196,13 @@ function matrisCiz(V, sayfa) {
 function puan4Ciz(V, sayfa) {
   const av = v => v > 0 ? 'pk' : v < 0 ? 'pm' : '';
   const kutular = V.gruplar.slice(0, 15).slice(sayfa * 4, sayfa * 4 + 4).map(g => {
-    const n = g.oyuncular.length, oynandi = g.maclar.length > 0;
-    const satir = g.puan.map(s => {
-      const ma = oynandi && s[0] >= 1 && s[0] <= 3 ? ' ma' + s[0] : '';
-      return `<tr><td class="ek sira${ma}">${esc(s[0])}</td><td class="ad">${esc(s[1])}</td><td class="h">${esc(s[2])}</td><td>${esc(s[3])}</td><td>${esc(s[4])}</td><td>${esc(s[5])}</td><td>${esc(s[6])}</td><td class="${av(s[10])}">${esc(s[10])}</td><td class="ek p">${esc(s[7])}</td></tr>`;
+    const n = g.oyuncular.length;
+    const satir = g.puan.map((s, i) => {
+      return `<tr${i === ILK_KAC - 1 ? ' class="ayrac"' : ''}><td class="ek sira">${esc(s[0])}</td><td class="ad">${esc(s[1])}</td><td class="h">${esc(s[2])}</td><td>${esc(s[3])}</td><td>${esc(s[4])}</td><td>${esc(s[5])}</td><td>${esc(s[6])}</td><td class="${av(s[10])}">${esc(s[10])}</td><td class="ek p">${esc(s[7])}</td></tr>`;
     }).join('');
     return `<div class="kutu pd"><h2>${g.no}. Grup · Puan Durumu<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table><tr><th style="width:9%">Sıra</th><th class="ad" style="width:36%">Oyuncu</th><th>H</th><th>O</th><th>G</th><th>B</th><th>M</th><th>Av</th><th style="width:9%">P</th></tr>${satir}</table></div>`;
   });
-  if (kutular.length < 4) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">H: handikap · O: oynadığı maç · G: galibiyet · B: beraberlik · M: mağlubiyet<br>Av: averaj · P: puan (altın, gümüş, bronz: ilk üç)</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
+  if (kutular.length < 4) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">H: handikap · O: oynadığı maç · G: galibiyet · B: beraberlik · M: mağlubiyet<br>Av: averaj · P: puan · Kesik çizgi: ilk ${ILK_KAC}</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
   const iz = $('izgara'); iz.className = 'izgara buyuk b4'; iz.innerHTML = kutular.join('');
 }
 
