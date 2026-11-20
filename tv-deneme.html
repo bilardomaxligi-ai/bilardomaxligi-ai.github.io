@@ -256,6 +256,7 @@ function plan() {
   if (SABIT) return s;
   // Maç programı: en yakın iki günün programı, 20'şer maçlık sayfalar
   const pg = programGunleri().slice(0, 2);
+  if (!pg.length) s.push({ t: 'program', gun: '', sayfa: 0, top: 1, sn: SURE.program });   // program boşken de slayt: "Programda maç yok"
   for (const gun of pg) { const n = Math.ceil(gunProgrami(gun).length / PROG_SAYFA); for (let i = 0; i < n; i++) s.push({ t: 'program', gun, sayfa: i, top: n, sn: SURE.program }); }
   if (SADECE_MATRIS) return s;
   for (const g of V.gruplar.slice(0, 15)) s.push({ t: 'puan', g: g.no, sn: SURE.puan });
@@ -292,6 +293,7 @@ function oynanmamis() { const o = new Set(); for (const gr of (V && V.gruplar ||
 function programGunleri() { const b = gunEk(0); return [...new Set(oynanmamis().map(p => p[0]).filter(t => t >= b))].sort(); }
 function gunProgrami(gun) { return oynanmamis().filter(p => p[0] === gun); }
 function programCiz(gun, sayfa, top) {
+  if (!gun) { $('baslik').textContent = 'Gelecek Maçlar'; $('ek').textContent = ''; $('icerik').innerHTML = '<div class="bosmesaj">Programda maç yok</div>'; return; }
   const hepsi = gunProgrami(gun), ps = hepsi.slice(sayfa * PROG_SAYFA, (sayfa + 1) * PROG_SAYFA);
   const d = new Date(gun + 'T12:00'), gunAd = d.toLocaleDateString('tr-TR', { weekday: 'long' });
   const [y, a, g] = gun.split('-');
