@@ -61,7 +61,11 @@ td.ust7{color:var(--altin)}
 .buyuk .kutu h2 span{font-size:calc(var(--u)*var(--carp)*1.2)}
 .buyuk th,.buyuk td{font-size:calc(var(--u)*var(--carp))}
 .buyuk th{height:calc(var(--u)*var(--carp)*1.5)}
-.buyuk td.ad{font-size:calc(var(--u)*var(--carp)*1.2)}
+.buyuk td.ad{font-size:calc(var(--u)*var(--carp)*1.2);font-weight:500}
+/* Puan durumu slaytı (4 grup, matrisle aynı düzen) */
+.pd th,.pd td{font-size:calc(var(--u)*var(--carp)*1.1)}
+.pd td.ad{font-size:calc(var(--u)*var(--carp)*1.25)}
+.pd td.pk{color:var(--k)} .pd td.pm{color:var(--m)}
 .buyuk td.sk2{font-weight:700;letter-spacing:-.03em;font-size:calc(var(--u)*var(--carp)*.88)}
 .buyuk td.ek{font-weight:800}
 /* Sütun başlığında oyuncu adı (dikey) */
@@ -125,7 +129,6 @@ td.ust7{color:var(--altin)}
 .bas .bt b .bgun{color:#7cc0ff;font-size:.62em;font-weight:700;margin-left:.5em;vertical-align:middle}
 .bosmesaj{height:100%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3);color:var(--soluk)}
 </style>
-<script>if (location.search.includes('ince')) document.write('<style>.buyuk td.ad{font-weight:500}</style>');</script>
 </head>
 <body>
 <div class="slayt" id="s-matris"><div class="izgara" id="izgara"></div></div>
@@ -187,12 +190,26 @@ function matrisCiz(V, sayfa) {
   kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">Hücrede satırdaki oyuncunun sayısı · <span class="k">galibiyet</span> · <span class="m">mağlubiyet</span> · <span class="b">beraberlik</span><br>H: handikap · S: sıra (altın: ilk ${ILK_KAC}) · P: puan · Av: averaj</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
   iz.innerHTML = kutular.join('');
 }
+// Puan durumu: matristeki aynı 4 grup, 2×2
+function puan4Ciz(V, sayfa) {
+  const av = v => v > 0 ? 'pk' : v < 0 ? 'pm' : '';
+  const kutular = V.gruplar.slice(0, 15).slice(sayfa * 4, sayfa * 4 + 4).map(g => {
+    const n = g.oyuncular.length, oynandi = g.maclar.length > 0;
+    const satir = g.puan.map(s => {
+      const ma = oynandi && s[0] >= 1 && s[0] <= 3 ? ' ma' + s[0] : '';
+      return `<tr><td class="ek sira${ma}">${esc(s[0])}</td><td class="ad">${esc(s[1])}</td><td class="h">${esc(s[2])}</td><td>${esc(s[3])}</td><td>${esc(s[4])}</td><td>${esc(s[5])}</td><td>${esc(s[6])}</td><td class="${av(s[10])}">${esc(s[10])}</td><td class="ek p">${esc(s[7])}</td></tr>`;
+    }).join('');
+    return `<div class="kutu pd"><h2>${g.no}. Grup · Puan Durumu<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table><tr><th style="width:9%">Sıra</th><th class="ad" style="width:36%">Oyuncu</th><th>H</th><th>O</th><th>G</th><th>B</th><th>M</th><th>Av</th><th style="width:9%">P</th></tr>${satir}</table></div>`;
+  });
+  if (kutular.length < 4) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">H: handikap · O: oynadığı maç · G: galibiyet · B: beraberlik · M: mağlubiyet<br>Av: averaj · P: puan (altın, gümüş, bronz: ilk üç)</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
+  const iz = $('izgara'); iz.className = 'izgara buyuk b4'; iz.innerHTML = kutular.join('');
+}
 
 // ---- Slayt gösterisi ----
 // Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
 // Çapraz tablo bir ekranda 4 grup gösterir (hücrede 40-50). ?grup=6 → 6 grup (65" 4K için), ?grup=15 → 15 grup tek ekran.
 // Adres sonuna ?sabit eklenirse yalnızca 15 grubun toplu çapraz tablosu sabit gösterilir.
-const SURE = { matris: 15, puan: 15, son: 60, program: 15 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
+const SURE = { matris: 12, puan: 10, son: 60, program: 15 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
 const SADECE_MATRIS = true;   // true: yalnızca çapraz tablo slaytları döner (puan durumu ve son maçlar kapalı)
 const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
 const P = new URLSearchParams(location.search);
@@ -219,7 +236,10 @@ function seritMaclari() {
 }
 function plan() {
   const s = [], ms = Math.ceil(15 / GRUP);
-  for (let i = 0; i < ms; i++) s.push({ t: 'matris', sayfa: i, sn: GRUP < 15 ? SURE.matris : 180 });
+  for (let i = 0; i < ms; i++) {
+    s.push({ t: 'matris', sayfa: i, sn: GRUP < 15 ? SURE.matris : 180 });
+    if (GRUP === 4) s.push({ t: 'puan4', sayfa: i, sn: SURE.puan });   // her matrisin ardından aynı 4 grubun puan durumu
+  }
   if (SABIT) return s;
   // Maç programı: en yakın iki günün programı, 20'şer maçlık sayfalar
   const pg = programGunleri().slice(0, 2);
@@ -276,6 +296,7 @@ function programCiz(gun, sayfa, top) {
 function icerikCiz(s) {
   if (s.t === 'matris') matrisCiz(V, s.sayfa || 0);
   else if (s.t === 'program') programCiz(s.gun, s.sayfa, s.top);
+  else if (s.t === 'puan4') puan4Ciz(V, s.sayfa);
   else if (s.t === 'puan') puanCiz(s.g);
   else sonCiz(s.sayfa, s.top);
 }
@@ -286,7 +307,7 @@ function goster() {
   void bar.offsetWidth; bar.style.transition = `width ${s.sn / HIZ}s linear`; bar.style.width = '100%';
   const mat = $('s-matris'), dig = $('s-diger');
   // Aynı tür slayt arka arkaya gelirse önce kararır, sonra yeni içerikle açılır
-  const hedef = s.t === 'matris' ? mat : dig, diger = hedef === mat ? dig : mat;
+  const hedef = s.t === 'matris' || s.t === 'puan4' ? mat : dig, diger = hedef === mat ? dig : mat;
   if (hedef.classList.contains('on')) { hedef.classList.remove('on'); setTimeout(() => { icerikCiz(s); hedef.classList.add('on'); }, 600); }
   else { icerikCiz(s); diger.classList.remove('on'); hedef.classList.add('on'); }
   zaman = setTimeout(() => ilerle(1), s.sn * 1000 / HIZ);
