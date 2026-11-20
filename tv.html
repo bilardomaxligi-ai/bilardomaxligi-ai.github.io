@@ -57,13 +57,32 @@ td.ust7{color:var(--altin)}
 .izgara.b4{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.5}
 .izgara.b6{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.05}
 .buyuk .kutu{padding:calc(var(--u)*.6) calc(var(--u)*.8) calc(var(--u)*.5)}
+/* 4 kutu birbirinden net ayrılsın: aralık ve belirgin çerçeve */
+.izgara.buyuk{gap:calc(var(--u)*1);padding:calc(var(--u)*.6)}
+.buyuk .kutu h2{margin-bottom:calc(var(--u)*.2)}
+.buyuk .kutu{padding-top:calc(var(--u)*.4);padding-bottom:calc(var(--u)*.3);border:2px solid #3d6a99;box-shadow:0 0 calc(var(--u)*1) rgba(0,0,0,.55)}
 .buyuk .kutu h2{font-size:calc(var(--u)*var(--carp)*1.75);margin-bottom:calc(var(--u)*.4)}
 .buyuk .kutu h2 span{font-size:calc(var(--u)*var(--carp)*1.2)}
 .buyuk th,.buyuk td{font-size:calc(var(--u)*var(--carp))}
 .buyuk th{height:calc(var(--u)*var(--carp)*1.5)}
-.buyuk td.ad{font-size:calc(var(--u)*var(--carp)*1.2)}
+.buyuk td.ad{font-size:calc(var(--u)*var(--carp)*1.2);font-weight:500}
+/* Puan durumu slaytı (4 grup, matrisle aynı düzen) */
+.pd th,.pd td{font-size:calc(var(--u)*var(--carp)*1.1)}
+.pd td.ad{font-size:calc(var(--u)*var(--carp)*1.25)}
+.pd td.pk{color:var(--k)} .pd td.pm{color:var(--m)}
+.pd td.sira{color:var(--altin)}
+.pd tr.ayrac td{border-bottom:calc(var(--u)*.18) dashed rgba(224,176,74,.45)}   /* ilk 7'nin altına kesik çizgi */
 .buyuk td.sk2{font-weight:700;letter-spacing:-.03em;font-size:calc(var(--u)*var(--carp)*.88)}
 .buyuk td.ek{font-weight:800}
+/* Matriste grup adı: başlık satırının sol köşesinde */
+.buyuk th.gb{position:relative;text-align:left;vertical-align:top;padding:calc(var(--u)*.2) 0 0 calc(var(--u)*.3);white-space:normal;border-left:0}
+.buyuk th.gb b{display:block;font-size:calc(var(--u)*var(--carp)*1.75);color:var(--altin);line-height:1.1}
+.buyuk th.gb small{display:block;font-size:calc(var(--u)*var(--carp)*1.05);color:var(--soluk);font-weight:600;margin-top:.35em}
+.buyuk th.gb .et{position:absolute;left:0;right:0;bottom:calc(var(--u)*.3);display:grid;grid-template-columns:calc(var(--u)*2.6) 1fr calc(var(--u)*2.8);color:var(--soluk);font-size:calc(var(--u)*var(--carp)*.9)}
+.buyuk th.gb .et i{font-style:normal;text-align:center} .buyuk th.gb .et i:nth-child(2){text-align:left;padding-left:calc(var(--u)*.3)}
+/* Sütun başlığında oyuncu adı (dikey) */
+.buyuk th.dik{height:auto;vertical-align:bottom;padding:calc(var(--u)*.25) 0}
+.buyuk th.dik span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;font-size:calc(var(--u)*var(--carp)*1.15);font-weight:700;color:var(--yazi);line-height:1.05;max-height:calc(var(--u)*var(--carp)*10.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .buyuk td.ek.sira.ma1{background:#e6b422;color:#1a1200}
 .buyuk td.ek.sira.ma2{background:#c3cad4;color:#14181e}
 .buyuk td.ek.sira.ma3{background:#c77a35;color:#1a0e04}
@@ -147,14 +166,16 @@ function buyukKutu(g) {
   const ol = g.oyuncular, n = ol.length;
   const puan = {}; for (const s of g.puan) puan[s[1]] = s;
   const oynandi = g.maclar.length > 0;   // hiç maç yokken madalya rengi gösterme
-  const basl = `<tr><th style="width:calc(var(--u)*2.6)">#</th><th class="ad" style="width:17%">Oyuncu</th><th style="width:calc(var(--u)*2.8)">H</th>${ol.map((_, j) => `<th>${j + 1}</th>`).join('')}<th class="ilk" style="width:calc(var(--u)*3.4)">Sıra</th><th style="width:calc(var(--u)*3.2)">P</th></tr>`;
+  // Grup adı ayrı satır yerine başlığın sol üstündeki boş köşede: matrise daha çok yer kalır
+  const sut = `<colgroup><col style="width:calc(var(--u)*2.6)"><col style="width:18.5%"><col style="width:calc(var(--u)*2.8)">${ol.map(() => '<col>').join('')}<col style="width:calc(var(--u)*3.4)"><col style="width:calc(var(--u)*3.2)"></colgroup>`;
+  const basl = `<tr><th class="gb" colspan="3"><b>${g.no}. Grup</b><small>${g.maclar.length} / ${n * (n - 1) / 2} maç</small><span class="et"><i>#</i><i>Oyuncu</i><i>H</i></span></th>${ol.map(([b]) => `<th class="dik"><span>${esc(b)}</span></th>`).join('')}<th class="ilk">Sıra</th><th>P</th></tr>`;
   const satir = ol.map(([a, h], i) => {
     const s = puan[a] || [];
     const hucre = ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = mac[a + '|' + b]; return m ? `<td class="sk2"><span class="${sinif(m[0], m[1])}">${esc(m[0])}</span>-<span class="${sinif(m[1], m[0])}">${esc(m[1])}</span></td>` : '<td></td>'; }).join('');
     const madalya = oynandi && s[0] >= 1 && s[0] <= 3 ? ' ma' + s[0] : '';
     return `<tr><td class="no">${i + 1}</td><td class="ad">${esc(a)}</td><td class="h">${esc(h)}</td>${hucre}<td class="ek ilk sira${madalya}">${esc(s[0])}</td><td class="ek p">${esc(s[7])}</td></tr>`;
   }).join('');
-  return `<div class="kutu"><h2>${g.no}. Grup<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table>${basl}${satir}</table></div>`;
+  return `<div class="kutu"><table>${sut}${basl}${satir}</table></div>`;
 }
 function matrisCiz(V, sayfa) {
   const iz = document.getElementById('izgara');
@@ -183,12 +204,25 @@ function matrisCiz(V, sayfa) {
   kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">Hücrede satırdaki oyuncunun sayısı · <span class="k">galibiyet</span> · <span class="m">mağlubiyet</span> · <span class="b">beraberlik</span><br>H: handikap · S: sıra (altın: ilk ${ILK_KAC}) · P: puan · Av: averaj</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
   iz.innerHTML = kutular.join('');
 }
+// Puan durumu: matristeki aynı 4 grup, 2×2
+function puan4Ciz(V, sayfa) {
+  const av = v => v > 0 ? 'pk' : v < 0 ? 'pm' : '';
+  const kutular = V.gruplar.slice(0, 15).slice(sayfa * 4, sayfa * 4 + 4).map(g => {
+    const n = g.oyuncular.length;
+    const satir = g.puan.map((s, i) => {
+      return `<tr${i === ILK_KAC - 1 ? ' class="ayrac"' : ''}><td class="ek sira">${esc(s[0])}</td><td class="ad">${esc(s[1])}</td><td class="h">${esc(s[2])}</td><td>${esc(s[3])}</td><td>${esc(s[4])}</td><td>${esc(s[5])}</td><td>${esc(s[6])}</td><td class="${av(s[10])}">${esc(s[10])}</td><td class="ek p">${esc(s[7])}</td></tr>`;
+    }).join('');
+    return `<div class="kutu pd"><h2>${g.no}. Grup · Puan Durumu<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table><tr><th style="width:9%">Sıra</th><th class="ad" style="width:36%">Oyuncu</th><th>H</th><th>O</th><th>G</th><th>B</th><th>M</th><th>Av</th><th style="width:9%">P</th></tr>${satir}</table></div>`;
+  });
+  if (kutular.length < 4) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">H: handikap · O: oynadığı maç · G: galibiyet · B: beraberlik · M: mağlubiyet<br>Av: averaj · P: puan · Kesik çizgi: ilk ${ILK_KAC}</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
+  const iz = $('izgara'); iz.className = 'izgara buyuk b4'; iz.innerHTML = kutular.join('');
+}
 
 // ---- Slayt gösterisi ----
 // Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
 // Çapraz tablo bir ekranda 4 grup gösterir (hücrede 40-50). ?grup=6 → 6 grup (65" 4K için), ?grup=15 → 15 grup tek ekran.
 // Adres sonuna ?sabit eklenirse yalnızca 15 grubun toplu çapraz tablosu sabit gösterilir.
-const SURE = { matris: 15, puan: 15, son: 60, program: 15 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
+const SURE = { matris: 12, puan: 10, son: 60, program: 15 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
 const SADECE_MATRIS = true;   // true: yalnızca çapraz tablo slaytları döner (puan durumu ve son maçlar kapalı)
 const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
 const P = new URLSearchParams(location.search);
@@ -215,10 +249,14 @@ function seritMaclari() {
 }
 function plan() {
   const s = [], ms = Math.ceil(15 / GRUP);
-  for (let i = 0; i < ms; i++) s.push({ t: 'matris', sayfa: i, sn: GRUP < 15 ? SURE.matris : 180 });
+  for (let i = 0; i < ms; i++) {
+    s.push({ t: 'matris', sayfa: i, sn: GRUP < 15 ? SURE.matris : 180 });
+    if (GRUP === 4) s.push({ t: 'puan4', sayfa: i, sn: SURE.puan });   // her matrisin ardından aynı 4 grubun puan durumu
+  }
   if (SABIT) return s;
   // Maç programı: en yakın iki günün programı, 20'şer maçlık sayfalar
   const pg = programGunleri().slice(0, 2);
+  if (!pg.length) s.push({ t: 'program', gun: '', sayfa: 0, top: 1, sn: SURE.program });   // program boşken de slayt: "Programda maç yok"
   for (const gun of pg) { const n = Math.ceil(gunProgrami(gun).length / PROG_SAYFA); for (let i = 0; i < n; i++) s.push({ t: 'program', gun, sayfa: i, top: n, sn: SURE.program }); }
   if (SADECE_MATRIS) return s;
   for (const g of V.gruplar.slice(0, 15)) s.push({ t: 'puan', g: g.no, sn: SURE.puan });
@@ -255,6 +293,7 @@ function oynanmamis() { const o = new Set(); for (const gr of (V && V.gruplar ||
 function programGunleri() { const b = gunEk(0); return [...new Set(oynanmamis().map(p => p[0]).filter(t => t >= b))].sort(); }
 function gunProgrami(gun) { return oynanmamis().filter(p => p[0] === gun); }
 function programCiz(gun, sayfa, top) {
+  if (!gun) { $('baslik').textContent = 'Gelecek Maçlar'; $('ek').textContent = ''; $('icerik').innerHTML = '<div class="bosmesaj">Programda maç yok</div>'; return; }
   const hepsi = gunProgrami(gun), ps = hepsi.slice(sayfa * PROG_SAYFA, (sayfa + 1) * PROG_SAYFA);
   const d = new Date(gun + 'T12:00'), gunAd = d.toLocaleDateString('tr-TR', { weekday: 'long' });
   const [y, a, g] = gun.split('-');
@@ -272,6 +311,7 @@ function programCiz(gun, sayfa, top) {
 function icerikCiz(s) {
   if (s.t === 'matris') matrisCiz(V, s.sayfa || 0);
   else if (s.t === 'program') programCiz(s.gun, s.sayfa, s.top);
+  else if (s.t === 'puan4') puan4Ciz(V, s.sayfa);
   else if (s.t === 'puan') puanCiz(s.g);
   else sonCiz(s.sayfa, s.top);
 }
@@ -282,7 +322,7 @@ function goster() {
   void bar.offsetWidth; bar.style.transition = `width ${s.sn / HIZ}s linear`; bar.style.width = '100%';
   const mat = $('s-matris'), dig = $('s-diger');
   // Aynı tür slayt arka arkaya gelirse önce kararır, sonra yeni içerikle açılır
-  const hedef = s.t === 'matris' ? mat : dig, diger = hedef === mat ? dig : mat;
+  const hedef = s.t === 'matris' || s.t === 'puan4' ? mat : dig, diger = hedef === mat ? dig : mat;
   if (hedef.classList.contains('on')) { hedef.classList.remove('on'); setTimeout(() => { icerikCiz(s); hedef.classList.add('on'); }, 600); }
   else { icerikCiz(s); diger.classList.remove('on'); hedef.classList.add('on'); }
   zaman = setTimeout(() => ilerle(1), s.sn * 1000 / HIZ);
