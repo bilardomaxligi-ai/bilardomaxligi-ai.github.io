@@ -74,9 +74,15 @@ td.ust7{color:var(--altin)}
 .pd tr.ayrac td{border-bottom:calc(var(--u)*.18) dashed rgba(224,176,74,.45)}   /* ilk 7'nin altına kesik çizgi */
 .buyuk td.sk2{font-weight:700;letter-spacing:-.03em;font-size:calc(var(--u)*var(--carp)*.88)}
 .buyuk td.ek{font-weight:800}
+/* Matriste grup adı: başlık satırının sol köşesinde */
+.buyuk th.gb{position:relative;text-align:left;vertical-align:top;padding:calc(var(--u)*.2) 0 0 calc(var(--u)*.3);white-space:normal;border-left:0}
+.buyuk th.gb b{display:block;font-size:calc(var(--u)*var(--carp)*1.75);color:var(--altin);line-height:1.1}
+.buyuk th.gb small{display:block;font-size:calc(var(--u)*var(--carp)*1.05);color:var(--soluk);font-weight:600;margin-top:.35em}
+.buyuk th.gb .et{position:absolute;left:0;right:0;bottom:calc(var(--u)*.3);display:grid;grid-template-columns:calc(var(--u)*2.6) 1fr calc(var(--u)*2.8);color:var(--soluk);font-size:calc(var(--u)*var(--carp)*.9)}
+.buyuk th.gb .et i{font-style:normal;text-align:center} .buyuk th.gb .et i:nth-child(2){text-align:left;padding-left:calc(var(--u)*.3)}
 /* Sütun başlığında oyuncu adı (dikey) */
 .buyuk th.dik{height:auto;vertical-align:bottom;padding:calc(var(--u)*.25) 0}
-.buyuk th.dik span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;font-size:calc(var(--u)*var(--carp)*1);font-weight:700;color:var(--yazi);line-height:1.05;max-height:calc(var(--u)*var(--carp)*8.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.buyuk th.dik span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;font-size:calc(var(--u)*var(--carp)*1.15);font-weight:700;color:var(--yazi);line-height:1.05;max-height:calc(var(--u)*var(--carp)*10.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .buyuk td.ek.sira.ma1{background:#e6b422;color:#1a1200}
 .buyuk td.ek.sira.ma2{background:#c3cad4;color:#14181e}
 .buyuk td.ek.sira.ma3{background:#c77a35;color:#1a0e04}
@@ -160,14 +166,16 @@ function buyukKutu(g) {
   const ol = g.oyuncular, n = ol.length;
   const puan = {}; for (const s of g.puan) puan[s[1]] = s;
   const oynandi = g.maclar.length > 0;   // hiç maç yokken madalya rengi gösterme
-  const basl = `<tr><th style="width:calc(var(--u)*2.6)">#</th><th class="ad" style="width:17%">Oyuncu</th><th style="width:calc(var(--u)*2.8)">H</th>${ol.map(([b]) => `<th class="dik"><span>${esc(b)}</span></th>`).join('')}<th class="ilk" style="width:calc(var(--u)*3.4)">Sıra</th><th style="width:calc(var(--u)*3.2)">P</th></tr>`;
+  // Grup adı ayrı satır yerine başlığın sol üstündeki boş köşede: matrise daha çok yer kalır
+  const sut = `<colgroup><col style="width:calc(var(--u)*2.6)"><col style="width:18.5%"><col style="width:calc(var(--u)*2.8)">${ol.map(() => '<col>').join('')}<col style="width:calc(var(--u)*3.4)"><col style="width:calc(var(--u)*3.2)"></colgroup>`;
+  const basl = `<tr><th class="gb" colspan="3"><b>${g.no}. Grup</b><small>${g.maclar.length} / ${n * (n - 1) / 2} maç</small><span class="et"><i>#</i><i>Oyuncu</i><i>H</i></span></th>${ol.map(([b]) => `<th class="dik"><span>${esc(b)}</span></th>`).join('')}<th class="ilk">Sıra</th><th>P</th></tr>`;
   const satir = ol.map(([a, h], i) => {
     const s = puan[a] || [];
     const hucre = ol.map(([b]) => { if (a === b) return '<td class="x"></td>'; const m = mac[a + '|' + b]; return m ? `<td class="sk2"><span class="${sinif(m[0], m[1])}">${esc(m[0])}</span>-<span class="${sinif(m[1], m[0])}">${esc(m[1])}</span></td>` : '<td></td>'; }).join('');
     const madalya = oynandi && s[0] >= 1 && s[0] <= 3 ? ' ma' + s[0] : '';
     return `<tr><td class="no">${i + 1}</td><td class="ad">${esc(a)}</td><td class="h">${esc(h)}</td>${hucre}<td class="ek ilk sira${madalya}">${esc(s[0])}</td><td class="ek p">${esc(s[7])}</td></tr>`;
   }).join('');
-  return `<div class="kutu"><h2>${g.no}. Grup<span>${g.maclar.length} / ${n * (n - 1) / 2} maç</span></h2><table>${basl}${satir}</table></div>`;
+  return `<div class="kutu"><table>${sut}${basl}${satir}</table></div>`;
 }
 function matrisCiz(V, sayfa) {
   const iz = document.getElementById('izgara');
