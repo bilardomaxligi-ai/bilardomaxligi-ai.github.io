@@ -57,6 +57,9 @@ td.ust7{color:var(--altin)}
 .izgara.b4{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.5}
 .izgara.b6{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.05}
 .buyuk .kutu{padding:calc(var(--u)*.6) calc(var(--u)*.8) calc(var(--u)*.5)}
+/* 4 kutu birbirinden net ayrılsın: aralık ve belirgin çerçeve */
+.izgara.buyuk{gap:calc(var(--u)*1.4);padding:calc(var(--u)*.9)}
+.buyuk .kutu{border:2px solid #3d6a99;box-shadow:0 0 calc(var(--u)*1) rgba(0,0,0,.55)}
 .buyuk .kutu h2{font-size:calc(var(--u)*var(--carp)*1.75);margin-bottom:calc(var(--u)*.4)}
 .buyuk .kutu h2 span{font-size:calc(var(--u)*var(--carp)*1.2)}
 .buyuk th,.buyuk td{font-size:calc(var(--u)*var(--carp))}
