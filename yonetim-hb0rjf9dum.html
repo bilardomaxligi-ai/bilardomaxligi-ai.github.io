@@ -346,7 +346,7 @@ function programCiz() {
 }
 function pFormCiz() {
   if (!$('pFTarih').value) $('pFTarih').value = yarin();   // yeni maç girişi varsayılan olarak yarına
-  const g = +$('pGrup').value, ol = grupOyunculari(g), o1 = $('pO1').value, o2 = $('pO2').value, gun = $('pFTarih').value;
+  const g = +$('pGrup').value, ol = grupOyunculari(g).slice().sort((x, y) => x.ad.localeCompare(y.ad, 'tr')), o1 = $('pO1').value, o2 = $('pO2').value, gun = $('pFTarih').value;   // program girişinde alfabetik
   const progda = ad => (ana.program || []).some(p => p.t === gun && (p.a === ad || p.b === ad) && !(pDuzen && ayniMac(p, pDuzen)));
   $('pO1').innerHTML = '<option value="">Seçin…</option>' + ol.map(o => `<option value="${esc(o.ad)}">${esc(o.ad)} (${o.hnd})${progda(o.ad) ? ' · o gün programda' : ''}</option>`).join('');
   $('pO1').value = ol.some(o => o.ad === o1) ? o1 : '';
