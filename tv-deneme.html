@@ -58,8 +58,9 @@ td.ust7{color:var(--altin)}
 .izgara.b6{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));--carp:1.05}
 .buyuk .kutu{padding:calc(var(--u)*.6) calc(var(--u)*.8) calc(var(--u)*.5)}
 /* 4 kutu birbirinden net ayrılsın: aralık ve belirgin çerçeve */
-.izgara.buyuk{gap:calc(var(--u)*1.4);padding:calc(var(--u)*.9)}
-.buyuk .kutu{border:2px solid #3d6a99;box-shadow:0 0 calc(var(--u)*1) rgba(0,0,0,.55)}
+.izgara.buyuk{gap:calc(var(--u)*1);padding:calc(var(--u)*.6)}
+.buyuk .kutu h2{margin-bottom:calc(var(--u)*.2)}
+.buyuk .kutu{padding-top:calc(var(--u)*.4);padding-bottom:calc(var(--u)*.3);border:2px solid #3d6a99;box-shadow:0 0 calc(var(--u)*1) rgba(0,0,0,.55)}
 .buyuk .kutu h2{font-size:calc(var(--u)*var(--carp)*1.75);margin-bottom:calc(var(--u)*.4)}
 .buyuk .kutu h2 span{font-size:calc(var(--u)*var(--carp)*1.2)}
 .buyuk th,.buyuk td{font-size:calc(var(--u)*var(--carp))}
@@ -70,12 +71,12 @@ td.ust7{color:var(--altin)}
 .pd td.ad{font-size:calc(var(--u)*var(--carp)*1.25)}
 .pd td.pk{color:var(--k)} .pd td.pm{color:var(--m)}
 .pd td.sira{color:var(--altin)}
-.pd tr.ayrac td{border-bottom:calc(var(--u)*.3) dashed var(--altin)}   /* ilk 7'nin altına kesik çizgi */
+.pd tr.ayrac td{border-bottom:calc(var(--u)*.18) dashed rgba(224,176,74,.45)}   /* ilk 7'nin altına kesik çizgi */
 .buyuk td.sk2{font-weight:700;letter-spacing:-.03em;font-size:calc(var(--u)*var(--carp)*.88)}
 .buyuk td.ek{font-weight:800}
 /* Sütun başlığında oyuncu adı (dikey) */
 .buyuk th.dik{height:auto;vertical-align:bottom;padding:calc(var(--u)*.25) 0}
-.buyuk th.dik span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;font-size:calc(var(--u)*var(--carp)*.95);font-weight:700;color:var(--yazi);line-height:1.05;max-height:calc(var(--u)*var(--carp)*9.5);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.buyuk th.dik span{writing-mode:vertical-rl;transform:rotate(180deg);display:inline-block;font-size:calc(var(--u)*var(--carp)*1);font-weight:700;color:var(--yazi);line-height:1.05;max-height:calc(var(--u)*var(--carp)*8.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .buyuk td.ek.sira.ma1{background:#e6b422;color:#1a1200}
 .buyuk td.ek.sira.ma2{background:#c3cad4;color:#14181e}
 .buyuk td.ek.sira.ma3{background:#c77a35;color:#1a0e04}
