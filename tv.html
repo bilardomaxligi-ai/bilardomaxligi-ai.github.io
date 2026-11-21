@@ -222,7 +222,7 @@ function puan4Ciz(V, sayfa) {
 // Süreler (saniye): toplu çapraz tablo, her grubun puan durumu, son maçların toplamı.
 // Çapraz tablo bir ekranda 4 grup gösterir (hücrede 40-50). ?grup=6 → 6 grup (65" 4K için), ?grup=15 → 15 grup tek ekran.
 // Adres sonuna ?sabit eklenirse yalnızca 15 grubun toplu çapraz tablosu sabit gösterilir.
-const SURE = { matris: 12, puan: 10, son: 60, program: 15 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
+const SURE = { matris: 15, puan: 15, son: 60, program: 15 };   // program: maç programı slaytı (bugün / yarın)   // matris: her çapraz tablo slaytı (4 grup) kaç saniye
 const SADECE_MATRIS = true;   // true: yalnızca çapraz tablo slaytları döner (puan durumu ve son maçlar kapalı)
 const SON_SAYFA = 48, SON_EN_FAZLA_SAYFA = 4;
 const P = new URLSearchParams(location.search);
@@ -256,7 +256,6 @@ function plan() {
   if (SABIT) return s;
   // Maç programı: en yakın iki günün programı, 20'şer maçlık sayfalar
   const pg = programGunleri().slice(0, 2);
-  if (!pg.length) s.push({ t: 'program', gun: '', sayfa: 0, top: 1, sn: SURE.program });   // program boşken de slayt: "Programda maç yok"
   for (const gun of pg) { const n = Math.ceil(gunProgrami(gun).length / PROG_SAYFA); for (let i = 0; i < n; i++) s.push({ t: 'program', gun, sayfa: i, top: n, sn: SURE.program }); }
   if (SADECE_MATRIS) return s;
   for (const g of V.gruplar.slice(0, 15)) s.push({ t: 'puan', g: g.no, sn: SURE.puan });
