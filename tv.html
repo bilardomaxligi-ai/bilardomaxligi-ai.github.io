@@ -139,6 +139,8 @@ td.ust7{color:var(--altin)}
 .pgs .vs.sk{color:var(--yazi);font-size:1em}
 .pgs .ms{text-align:right;padding-right:calc(var(--u)*.8);color:var(--soluk);font-size:.68em;font-weight:600}
 .bas .bt b .bgun{color:#7cc0ff;font-size:.62em;font-weight:700;margin-left:.5em;vertical-align:middle}
+.serit .spnr{flex:none;display:flex;align-items:center;background:#0b2036;border-left:2px solid var(--altin);padding:0 calc(var(--u)*1.2);box-shadow:calc(var(--u)*-.6) 0 calc(var(--u)*1) rgba(0,0,0,.5);z-index:1}
+.serit .spnr img{height:calc(var(--sh) - var(--u)*.5)}
 .bosmesaj{height:100%;display:flex;align-items:center;justify-content:center;font-size:calc(var(--u)*3);color:var(--soluk)}
 </style>
 </head>
@@ -150,7 +152,7 @@ td.ust7{color:var(--altin)}
   <main id="icerik"></main>
 </div>
 <div class="ilerle" id="ilerle"></div>
-<div class="serit"><div class="etiket">SON MAÇLAR</div><div class="yol"><div class="ic" id="seritIc"></div></div></div>
+<div class="serit"><div class="etiket">SON MAÇLAR</div><div class="yol"><div class="ic" id="seritIc"></div></div><div class="spnr"><img src="sponsor-kisa.png" alt="Önem Gümrük Müşavirliği"></div></div>
 <div class="hata" id="hata">Bağlantı yok, son veriler gösteriliyor</div>
 <script>
 const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
