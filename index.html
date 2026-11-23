@@ -151,6 +151,8 @@ td.p{font-weight:700;color:var(--gold)}
 .acilis .a-ad{font-size:22px;font-weight:700;color:var(--gold);margin-top:4px}
 .acilis .a-sp{font-size:13px;color:var(--muted);font-style:italic;margin-top:18px}
 .acilis .a-mt{width:160px;height:auto;animation:spGel .8s ease-out both}
+.acilis .a-sp2{margin-top:10px}
+.acilis .a-on{width:140px;height:auto;animation:spGel .8s ease-out .2s both}
 .acilis .a-yuk{display:flex;gap:9px;margin-top:34px}
 .acilis .a-yuk i{width:10px;height:10px;border-radius:50%;background:var(--gold);animation:nokta 1.2s ease-in-out infinite}
 .acilis .a-yuk i:nth-child(2){animation-delay:.2s} .acilis .a-yuk i:nth-child(3){animation-delay:.4s}
@@ -250,7 +252,7 @@ nav button.yeni::after{content:"";display:inline-block;width:7px;height:7px;bord
   <div class="sp-kart"><div>Ana sponsor</div><img src="marmatek.png" alt="Marmatek"><div class="ikinci"><div>Sponsor</div><img class="onem" src="sponsor-kisa.png" alt="Önem Gümrük Müşavirliği"></div></div>
   <div class="imza">Created by <b>Ali Kazırlar</b></div>
 </main>
-<div class="acilis" id="acilis"><img class="a-bm" src="logo.png" alt="Bilardomax"><div class="a-ad">25. Bilardomax Ligi</div><div class="a-sp">sponsored by</div><img class="a-mt" src="marmatek.png" alt="Marmatek"><div class="a-yuk"><i></i><i></i><i></i></div><div class="a-yz">Sonuçlar yükleniyor</div><div class="a-imza">Created by <b>Ali Kazırlar</b></div></div>
+<div class="acilis" id="acilis"><img class="a-bm" src="logo.png" alt="Bilardomax"><div class="a-ad">25. Bilardomax Ligi</div><div class="a-sp">Ana sponsor</div><img class="a-mt" src="marmatek.png" alt="Marmatek"><div class="a-sp a-sp2">Sponsor</div><img class="a-on" src="sponsor-kisa.png" alt="Önem Gümrük Müşavirliği"><div class="a-yuk"><i></i><i></i><i></i></div><div class="a-yz">Sonuçlar yükleniyor</div><div class="a-imza">Created by <b>Ali Kazırlar</b></div></div>
 <script>
 // Veri adresi: Apps Script yayın adresi. Boşsa yanındaki veri.json okunur (önizleme).
 const VERI_ADRESI = location.hostname === 'localhost' ? '' : 'https://script.google.com/macros/s/AKfycbyQDjzNxQFmFrvgv81QPkcPoCan45LJureCexi0zVxUYZ52hntVW78ffgYPjLr4CgY9Pw/exec';
