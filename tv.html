@@ -218,6 +218,25 @@ function puan4Ciz(V, sayfa) {
   });
   if (kutular.length < 4) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">H: handikap · O: oynadığı maç · G: galibiyet · B: beraberlik · M: mağlubiyet<br>Av: averaj · P: puan · Kesik çizgi: ilk ${ILK_KAC}</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
   const iz = $('izgara'); iz.className = 'izgara buyuk b4'; iz.innerHTML = kutular.join('');
+  satirYay(iz); setTimeout(() => satirYay(iz), 800);   // yazı tipi/yerleşim oturduktan sonra bir kez daha
+}
+// Bazı TV tarayıcıları tabloyu kutu boyuna yaymıyor: satır yüksekliğini elle verip kutuyu doldur
+function satirYay(iz) {
+  const kutular = iz.querySelectorAll('.kutu.pd');
+  for (let j = 0; j < kutular.length; j++) {
+    const k = kutular[j], t = k.querySelector('table'), h = k.querySelector('h2');
+    if (!t || !h || t.rows.length < 2) continue;
+    const ks = getComputedStyle(k), hs = getComputedStyle(h);
+    const bos = k.clientHeight - parseFloat(ks.paddingTop) - parseFloat(ks.paddingBottom) - h.offsetHeight - parseFloat(hs.marginTop) - parseFloat(hs.marginBottom);
+    const n = t.rows.length - 1;
+    let yuk = (bos - t.rows[0].offsetHeight) / n;
+    for (let tur = 0; tur < 3 && yuk > 0; tur++) {   // ölç, farkı satırlara dağıt (kenarlıklar vb. için)
+      for (let i = 1; i <= n; i++) t.rows[i].style.height = Math.floor(yuk) + 'px';
+      const fark = bos - t.offsetHeight;
+      if (Math.abs(fark) < 2) break;
+      yuk += fark / n;
+    }
+  }
 }
 
 // ---- Slayt gösterisi ----
