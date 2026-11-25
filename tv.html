@@ -186,6 +186,7 @@ function matrisCiz(V, sayfa) {
     const kutular = gr.map(buyukKutu);
     if (kutular.length < GRUP) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">Hücrede satırdaki oyuncunun skoru solda · <span class="k">galibiyet</span> · <span class="m">mağlubiyet</span> · <span class="b">beraberlik</span><br>H: handikap · Sıra: anlık sıralama (altın, gümüş, bronz: ilk üç) · P: puan</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
     iz.className = 'izgara buyuk b' + GRUP; iz.innerHTML = kutular.join('');
+    basHizala(iz); setTimeout(() => basHizala(iz), 800);
     return;
   }
   iz.className = 'izgara';
@@ -219,6 +220,13 @@ function puan4Ciz(V, sayfa) {
   if (kutular.length < 4) kutular.push(`<div class="kutu bilgi"><img class="bm" src="logo.png" alt=""><div class="ad">25. Bilardomax Ligi</div><div class="sp">sponsored by <img src="marmatek.png" alt="Marmatek"></div><div class="gun">Son güncelleme: ${esc(tarihYaz(V.guncelleme))}</div><div class="acik">H: handikap · O: oynadığı maç · G: galibiyet · B: beraberlik · M: mağlubiyet<br>Av: averaj · P: puan · Kesik çizgi: ilk ${ILK_KAC}</div><div class="imza">Created by <b>Ali Kazırlar</b></div></div>`);
   const iz = $('izgara'); iz.className = 'izgara buyuk b4'; iz.innerHTML = kutular.join('');
   satirYay(iz); setTimeout(() => satirYay(iz), 800);   // yazı tipi/yerleşim oturduktan sonra bir kez daha
+}
+// Oyuncu adları kısa olan grupta başlık daha alçak kalıyordu: tüm grupların başlığını en yükseğine eşitle, 1. sıralar aynı hizada olsun
+function basHizala(iz) {
+  const r = [].slice.call(iz.querySelectorAll('.kutu table')).map(t => t.rows[0]).filter(Boolean);
+  r.forEach(x => { x.style.height = ''; });
+  const m = Math.max.apply(null, r.map(x => x.offsetHeight));
+  if (m > 0) r.forEach(x => { x.style.height = m + 'px'; });
 }
 // Bazı TV tarayıcıları tabloyu kutu boyuna yaymıyor: satır yüksekliğini elle verip kutuyu doldur
 function satirYay(iz) {
